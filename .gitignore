@@ -3,3 +3,4 @@ work/
 .venv/
 results/*.log
 __pycache__/
+contaminated-results/

@@ -38,9 +38,18 @@ def main():
     T, slug = f"{ROOT}/tasks/click-{pr}", f"click-{pr}__{model}"
     task = json.load(open(f"{T}/task.json"))
     wt = f"{ROOT}/work/{slug}"
+    # A git worktree shares the upstream object database, so a candidate could
+    # run `git log --all --grep=...` and read the very fix it is being asked to
+    # write. Export a history-free snapshot instead and re-init it, so `git
+    # diff` still works but the future of the project does not exist.
+    shutil.rmtree(wt, ignore_errors=True); os.makedirs(wt)
     with _WtLock():
-        sh(["git","worktree","remove","--force",wt], REPO); shutil.rmtree(wt, ignore_errors=True)
-        sh(["git","worktree","add","--detach",wt,task["base_commit"]], REPO, check=True)
+        tar = sp.run(["git","archive",task["base_commit"]], cwd=REPO, capture_output=True, check=True)
+    sp.run(["tar","-x","-C",wt], input=tar.stdout, check=True)
+    sh(["git","init","-q"], wt, check=True)
+    sh(["git","add","-A"], wt, check=True)
+    sh(["git","-c","user.email=bench@local","-c","user.name=bench",
+        "commit","-q","-m","base"], wt, check=True)
     problem = open(f"{T}/problem.md").read()
     t0 = time.time()
     r = sh(["claude","-p",PROMPT.format(problem=problem),"--model",model,
@@ -59,6 +68,5 @@ def main():
     json.dump(rec, open(f"{ROOT}/results/{slug}.json","w"), indent=2)
     open(f"{ROOT}/results/{slug}.diff","w").write(diff)
     print(json.dumps(rec))
-    with _WtLock():
-        sh(["git","worktree","remove","--force",wt], REPO)
+    shutil.rmtree(wt, ignore_errors=True)
 main()

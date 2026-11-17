@@ -48,12 +48,20 @@ Saying "page 2 shows me row 11 twice" measures engineering.
 
 ## How grading works
 
-1. Check out the repo at `base_commit` in a clean worktree.
+1. Export the project at `base_commit` into a **history-free** directory and
+   re-initialise it as a fresh single-commit repository.
 2. Hand the model the problem statement and nothing else. It never sees the tests.
 3. Discard any edit it made under `tests/` — then apply the official `test.patch`.
 4. Run `fail_to_pass` and `pass_to_pass`.
 
 **Resolved** = every fail-to-pass test passes *and* no pass-to-pass test broke.
+
+The export in step 1 is not a git worktree, and that distinction is the whole
+ball game. A worktree shares the upstream object database, so a candidate can
+run `git log --all --grep="..."` and read the exact commit it is being asked to
+reproduce. The sealed export contains one commit named `base`; the project's
+future does not exist inside it, while `git diff` still captures the
+candidate's own work.
 
 Outcomes are read from pytest's JUnit XML rather than scraped from stdout,
 because `FAILED` lines carry a trailing ` - message` that makes text parsing
