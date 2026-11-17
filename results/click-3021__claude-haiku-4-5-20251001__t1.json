@@ -7,10 +7,7 @@
   "agent_exit": 0,
   "diff_lines": 24,
   "shell_calls": 23,
-  "contamination_flags": [
-    "Bash:pip install -e . -q && python3 -m pytest tests/test_termui.py -xvs 2>&1 | head -300",
-    "Bash:pip install -e . --break-system-packages -q 2>&1 | head -50"
-  ],
+  "contamination_flags": [],
   "resolved": false,
   "f2p_passed": 0,
   "f2p_total": 1,

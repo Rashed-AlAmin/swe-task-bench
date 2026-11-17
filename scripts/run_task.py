@@ -4,6 +4,8 @@ The model gets the repo at the base commit plus the problem statement only.
 The new tests are applied afterwards, by grade.py, and are never visible to it.
 """
 import fcntl, json, os, re, shutil, subprocess as sp, sys, time
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from screen import flag_for
 ROOT = os.path.expanduser("~/Desktop/swe-task-bench")
 REPO, VENV = f"{ROOT}/repo", f"{ROOT}/.venv/bin/python"
 PROMPT = """You are fixing a bug in this Python repository (the `click` library).
@@ -75,10 +77,9 @@ def main():
             if c["name"] != "Bash": continue
             cmd = (c.get("input") or {}).get("command", ""); ncalls += 1
             cmdlog.append(cmd.replace("\n", " ⏎ ")[:300])
-            if re.search(r"\b(pip3?|uv|poetry|pipx)\b.*\b(install|download|add)\b|curl|wget|"
-                         r"git\s+(clone|fetch|pull|remote)|pypi\.org|files\.pythonhosted|"
-                         r"github\.com|raw\.githubusercontent", cmd):
-                suspect.append(f"Bash:{cmd[:160]}")
+            why = flag_for(cmd)
+            if why:
+                suspect.append(f"{why} :: {cmd[:160]}")
     open(f"{ROOT}/results/{slug}.cmds.txt","w").write("\n".join(cmdlog))
     diff = sh(["git","diff"], wt).stdout
     g = sh([VENV, f"{ROOT}/scripts/grade.py", wt, T])

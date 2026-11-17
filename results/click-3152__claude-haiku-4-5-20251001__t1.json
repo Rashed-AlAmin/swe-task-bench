@@ -7,9 +7,7 @@
   "agent_exit": 0,
   "diff_lines": 13,
   "shell_calls": 43,
-  "contamination_flags": [
-    "Bash:python3 -m pip install -e . -q"
-  ],
+  "contamination_flags": [],
   "resolved": true,
   "f2p_passed": 2,
   "f2p_total": 2,

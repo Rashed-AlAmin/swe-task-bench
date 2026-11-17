@@ -1,0 +1,20 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t1 -type f -name "*.py" | head -20
+ls -la
+grep -n "Aborted" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t1/src/click/core.py
+grep -n "KeyboardInterrupt" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t1/src/click/*.py
+python -m pytest tests/ -xvs -k "keyboard or interrupt or abort" 2>&1 | head -100
+python3 -m pytest tests/ -xvs -k "keyboard or interrupt or abort" 2>&1 | head -100
+pip install -e . -q
+pip install --break-system-packages -e . -q
+python3 -m pytest tests/ -xvs -k "keyboard or interrupt or abort" 2>&1
+grep -A 20 "test_abort_exceptions_with_disabled_standalone_mode" tests/test_commands.py
+python3 -m pytest tests/test_commands.py -xvs 2>&1 | head -150
+python3 -m pytest tests/ -x --tb=short 2>&1 | tail -50
+python3 test_double_interrupt.py
+python3 -c " ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ @click.option('--target', prompt='Target host') ⏎ def cli(target): ⏎     pass ⏎  ⏎ runner = CliRunner() ⏎ result = runner.invoke(cli, input='\x03\x03', catch_exceptions=True) ⏎ print(f'Exit code: {result.exit_c
+python3 test_double_interrupt.py
+python3 -m pytest test_double_interrupt.py -xvs
+python3 -c " ⏎ import click ⏎ import time ⏎ import sys ⏎  ⏎ @click.command() ⏎ @click.option('--target', prompt='Target host') ⏎ def deploy(target): ⏎     for step in range(10): ⏎         click.echo(f'step {step} on {target}') ⏎         time.sleep(0.1) ⏎  ⏎ # Test with direct KeyboardInterrupt ⏎ try
+python3 test_eoferror.py
+python3 -m pytest tests/ -x --tb=short -q 2>&1 | tail -20
+rm /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t1/test_repro.py /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t1/test_double_interrupt.py /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-
