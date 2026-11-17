@@ -1,0 +1,32 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 9cf05a9..56fc36f 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -3271,7 +3271,12 @@ class Option(Parameter):
+     def get_error_hint(self, ctx: Context | None) -> str:
+         result = super().get_error_hint(ctx)
+         if self.show_envvar and self.envvar is not None:
+-            result += f" (env var: '{self.envvar}')"
++            if isinstance(self.envvar, str):
++                envvar_str = f"'{self.envvar}'" if self.envvar else ""
++            else:
++                envvar_str = ", ".join(f"'{d}'" for d in self.envvar if d)
++            if envvar_str:
++                result += f" (env var: {envvar_str})"
+         return result
+ 
+     def _parse_decls(
+@@ -3449,9 +3454,11 @@ class Option(Parameter):
+ 
+             if envvar is not None:
+                 if isinstance(envvar, str):
+-                    extra["envvars"] = (envvar,)
++                    envvars = (envvar,) if envvar else ()
+                 else:
+-                    extra["envvars"] = tuple(str(d) for d in envvar)
++                    envvars = tuple(str(d) for d in envvar if d)
++                if envvars:
++                    extra["envvars"] = envvars
+ 
+         # Temporarily enable resilient parsing to avoid type casting
+         # failing for the default. Might be possible to extend this to

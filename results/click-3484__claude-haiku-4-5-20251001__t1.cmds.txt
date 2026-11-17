@@ -1,0 +1,34 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t1 -type f -name "*.py" | head -20
+python test_repro.py
+python3 -m pip install -e . -q && python3 test_repro.py
+PYTHONPATH=src python3 test_repro.py
+PYTHONPATH=src python3 test_repro.py --config ./staging.toml
+PYTHONPATH=src python3 test_repro.py
+PYTHONPATH=src python3 -c "import click; print('COMMANDLINE:', click.ParameterSource.COMMANDLINE); print('DEFAULT:', click.ParameterSource.DEFAULT); print('ENVIRONMENT:', click.ParameterSource.ENVIRONMENT); print('DEFAULT_MAP:', click.ParameterSource.DEFAULT_MAP); print('PROMPT:', click.ParameterSou
+PYTHONPATH=src python3 test_repro.py --config ./staging.toml
+PYTHONPATH=src python3 test_eager_flag.py
+PYTHONPATH=src python3 test_eager_flag.py --debug
+python3 -m pytest tests/ -xvs 2>&1 | head -100
+PYTHONPATH=src python3 -m pytest tests/ -xvs 2>&1 | head -150
+PYTHONPATH=src python3 -m pytest tests/ -W ignore::DeprecationWarning -W ignore::pytest.PytestRemovedIn10Warning -x 2>&1 | tail -100
+PYTHONPATH=src grep -r "get_parameter_source\|set_parameter_source\|ParameterSource" tests/ --include="*.py" | head -30
+PYTHONPATH=src grep -B5 -A10 "get_parameter_source" tests/test_defaults.py
+PYTHONPATH=src grep -B10 -A20 "get_parameter_source" tests/test_context.py
+PYTHONPATH=src python3 test_param_source_in_type.py
+PYTHONPATH=src python3 -m pytest test_param_source_in_type.py -xvs
+PYTHONPATH=src grep -r "feature.switch\|3403\|cls_switch\|is_winner" tests/ --include="*.py" | head -20
+PYTHONPATH=src python3 -m pytest tests/test_options.py -k "3403" -xvs
+PYTHONPATH=src python3 -m pytest tests/test_options.py -k "feature" -xvs
+PYTHONPATH=src python3 -m pytest tests/test_options.py -x 2>&1 | tail -50
+PYTHONPATH=src grep -B5 -A5 "get_parameter_source" src/click/shell_completion.py
+PYTHONPATH=src python3 -m pytest tests/test_shell_completion.py -x 2>&1 | tail -30
+PYTHONPATH=src python3 -m pytest tests/ -W ignore::DeprecationWarning -W ignore::pytest.PytestRemovedIn10Warning --tb=short 2>&1 | tail -50
+PYTHONPATH=src python3 test_repro.py && echo "---" && PYTHONPATH=src python3 test_repro.py --config ./staging.toml
+PYTHONPATH=src python3 test_eager_flag.py && echo "---" && PYTHONPATH=src python3 test_eager_flag.py --debug
+rm /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t1/test_repro.py /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t1/test_eager_flag.py /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-2025
+PYTHONPATH=src python3 test_env_source.py && echo "---" && PYTHONPATH=src CONFIG_VAR=/custom/config python3 test_env_source.py && echo "---" && PYTHONPATH=src python3 test_env_source.py --config /cli/config
+rm /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t1/test_env_source.py
+git diff src/click/core.py
+PYTHONPATH=src python3 -m pytest tests/ -W ignore::DeprecationWarning -W ignore::pytest.PytestRemovedIn10Warning -q 2>&1 | tail -10
+PYTHONPATH=src python3 final_test.py
+rm /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t1/final_test.py
