@@ -1,0 +1,5 @@
+repo/
+work/
+.venv/
+results/*.log
+__pycache__/

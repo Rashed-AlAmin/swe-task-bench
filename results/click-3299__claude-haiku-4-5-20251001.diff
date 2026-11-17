@@ -1,0 +1,33 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index f0a624b..197b360 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -3092,7 +3092,7 @@ class Option(Parameter):
+             show_default = ctx.show_default
+ 
+         if show_default_is_str or (
+-            show_default and (default_value not in (None, UNSET))
++            show_default and (default_value is not None and default_value is not UNSET)
+         ):
+             if show_default_is_str:
+                 default_string = f"({self.show_default})"
+@@ -3110,10 +3110,16 @@ class Option(Parameter):
+                 )[1]
+             elif self.is_bool_flag and not self.secondary_opts and not default_value:
+                 default_string = ""
+-            elif default_value == "":
+-                default_string = '""'
+             else:
+-                default_string = str(default_value)
++                try:
++                    is_empty_str = default_value == ""
++                except TypeError:
++                    is_empty_str = False
++
++                if is_empty_str:
++                    default_string = '""'
++                else:
++                    default_string = str(default_value)
+ 
+             if default_string:
+                 extra["default"] = default_string

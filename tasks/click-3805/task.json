@@ -1,0 +1,29 @@
+{
+  "base_commit": "3cbcf9b11546f4cf10b36d3e2e531733ba6fe001",
+  "body": "Just a small issue I encountered on Python 3.10, where `Enum` has no `__deepcopy__`. Now that every parameter have a sentinel, `copy.deepcopy()` of any `Option`, `Argument` or `Command` fails on Python 3.10. And `pickle` fails on every Python version. This PR fix this issue.",
+  "merge_commit": "4295457ddc7b5ca9a733d59ca40d9651b02b9b1d",
+  "merged_at": "2026-08-29T15:12:36Z",
+  "pr": 3805,
+  "title": "Fix `copy`, `deepcopy` and `pickle` of `Sentinel` members",
+  "url": "https://github.com/pallets/click/pull/3805",
+  "test_files": [
+    "tests/test_utils/test_sentinel.py"
+  ],
+  "fail_to_pass": [
+    "tests/test_utils/test_sentinel.py::test_parameter_duplication[pickle]",
+    "tests/test_utils/test_sentinel.py::test_sentinel_duplication_preserves_identity[pickle-Sentinel.FLAG_NEEDS_VALUE]",
+    "tests/test_utils/test_sentinel.py::test_sentinel_duplication_preserves_identity[pickle-Sentinel.UNSET]"
+  ],
+  "pass_to_pass": [
+    "tests/test_utils/test_sentinel.py::test_parameter_duplication[copy]",
+    "tests/test_utils/test_sentinel.py::test_parameter_duplication[deepcopy]",
+    "tests/test_utils/test_sentinel.py::test_sentinel_duplication_preserves_identity[copy-Sentinel.FLAG_NEEDS_VALUE]",
+    "tests/test_utils/test_sentinel.py::test_sentinel_duplication_preserves_identity[copy-Sentinel.UNSET]",
+    "tests/test_utils/test_sentinel.py::test_sentinel_duplication_preserves_identity[deepcopy-Sentinel.FLAG_NEEDS_VALUE]",
+    "tests/test_utils/test_sentinel.py::test_sentinel_duplication_preserves_identity[deepcopy-Sentinel.UNSET]",
+    "tests/test_utils/test_sentinel.py::test_unset_sentinel"
+  ],
+  "broken_after_gold": [],
+  "n_f2p": 3,
+  "n_p2p": 7
+}

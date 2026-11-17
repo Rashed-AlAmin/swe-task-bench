@@ -1,0 +1,34 @@
+{
+  "base_commit": "36deba8a95a2585de1a2aa4475b7f054f52830ac",
+  "body": "Commit 262bdf0 ensured to raise an `EOFError` exception on end of input to simulate tty behavior and avoid blocking prompt during tests when no more input is available.\r\n\r\nHowever the introduced implementation has a side effect when testing a click command having a `File` type option or argument and when it is set to `stdin`: the command ends up with error due to the `Abort` exception being raised when the stdin `EOFError` exception is caught.\r\n\r\nTo prevent this undesirable side effect, prefer to raise the `EOFError` exceptions directly from the prompts functions inside the `CliRunner` class instead of doing it in the method overriding the iterator protcol for the` _NamedTextIOWrapper` class.\r\n\r\nRestore previous implementation of a test broken by changes of 262bdf0.\r\n\r\nFixes #2939.\r\n\r\n<!--\r\nBefore opening a PR, open a ticket describing the issue or feature the\r\nPR will address. An issue is not required for fixing typos in\r\ndocumentation, or other simple non-code changes.\r\n\r\nReplace this comment with a description of the change. Describe how it\r\naddresses the linked ticket.\r\n-->\r\n\r\n<!--\r\nLink to relevant issues or previous PRs, one per line. Use \"fixes\" to\r\nautomatically close an issue.\r\n\r\nfixes #<issue number>\r\n-->\r\n\r\n<!--\r\nEnsure each step in CONTRIBUTING.rst is complete, especially the following:\r\n\r\n- Add tests that demonstrate the correct behavior of the change. Tests\r\n  should fail without the change.\r\n- Add or update relevant docs, in the docs folder and in code.\r\n- Add an entry in CHANGES.rst summarizing the change and linking to the issue.\r\n- Add `.. versionchanged::` entries in any relevant code docs.\r\n-->\r\n",
+  "merge_commit": "2a0e3ba907927ade6951d5732b775f11b54cb766",
+  "merged_at": "2025-09-13T04:36:16Z",
+  "pr": 2940,
+  "title": "testing/CliRunner: Fix regression related to EOF introduced in 262bdf0",
+  "url": "https://github.com/pallets/click/pull/2940",
+  "test_files": [
+    "tests/test_chain.py"
+  ],
+  "fail_to_pass": [
+    "tests/test_chain.py::test_pipeline[args0-foo\\nbar-expect0]",
+    "tests/test_chain.py::test_pipeline[args1-foo \\n bar-expect1]",
+    "tests/test_chain.py::test_pipeline[args2-foo \\n bar-expect2]"
+  ],
+  "pass_to_pass": [
+    "tests/test_chain.py::test_args_and_chain",
+    "tests/test_chain.py::test_basic_chaining",
+    "tests/test_chain.py::test_chaining_help[args0-COMMAND1 [ARGS]... [COMMAND2 [ARGS]...]...]",
+    "tests/test_chain.py::test_chaining_help[args1-ROOT HELP]",
+    "tests/test_chain.py::test_chaining_help[args2-SDIST HELP]",
+    "tests/test_chain.py::test_chaining_help[args3-BDIST HELP]",
+    "tests/test_chain.py::test_chaining_help[args4-SDIST HELP]",
+    "tests/test_chain.py::test_chaining_with_arguments",
+    "tests/test_chain.py::test_chaining_with_options",
+    "tests/test_chain.py::test_group_arg_behavior",
+    "tests/test_chain.py::test_no_command_result_callback[False-1]",
+    "tests/test_chain.py::test_no_command_result_callback[True-[]]"
+  ],
+  "broken_after_gold": [],
+  "n_f2p": 3,
+  "n_p2p": 12
+}
