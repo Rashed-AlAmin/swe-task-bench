@@ -1,16 +1,18 @@
 {
   "pr": 3299,
   "model": "claude-haiku-4-5-20251001",
+  "trial": 1,
   "title": "Fix speculative empty string check",
-  "elapsed_s": 92.7,
+  "elapsed_s": 106.6,
   "agent_exit": 0,
   "diff_lines": 22,
+  "shell_calls": 22,
+  "contamination_flags": [],
   "resolved": true,
   "f2p_passed": 1,
   "f2p_total": 1,
   "p2p_broken": 0,
   "p2p_total": 551,
   "tampered_with_tests": false,
-  "p2p_broken_ids": [],
-  "trial": 1
+  "p2p_broken_ids": []
 }

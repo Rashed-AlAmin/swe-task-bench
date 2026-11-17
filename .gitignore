@@ -4,3 +4,4 @@ work/
 results/*.log
 __pycache__/
 contaminated-results/
+results/*.jsonl

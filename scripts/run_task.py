@@ -3,7 +3,7 @@
 The model gets the repo at the base commit plus the problem statement only.
 The new tests are applied afterwards, by grade.py, and are never visible to it.
 """
-import fcntl, json, os, shutil, subprocess as sp, sys, time
+import fcntl, json, os, re, shutil, subprocess as sp, sys, time
 ROOT = os.path.expanduser("~/Desktop/swe-task-bench")
 REPO, VENV = f"{ROOT}/repo", f"{ROOT}/.venv/bin/python"
 PROMPT = """You are fixing a bug in this Python repository (the `click` library).
@@ -55,17 +55,40 @@ def main():
     t0 = time.time()
     r = sh(["claude","-p",PROMPT.format(problem=problem),"--model",model,
             "--permission-mode","acceptEdits","--max-turns","60",
+            "--output-format","stream-json","--verbose",
             "--allowedTools","Read","Edit","Write","Grep","Glob","Bash"], cwd=wt, timeout=1800)
     elapsed = round(time.time()-t0, 1)
+    os.makedirs(f"{ROOT}/results", exist_ok=True)
+    open(f"{ROOT}/results/{slug}.jsonl","w").write(r.stdout)
+    # The candidate has a shell. Nothing stops it fetching a released copy of
+    # the library that already contains the fix, so every shell command it ran
+    # is recorded and screened; a flagged run is reported, never silently kept.
+    suspect, ncalls, cmdlog = [], 0, []
+    for line in r.stdout.splitlines():
+        try: d = json.loads(line)
+        except Exception: continue
+        if d.get("type") != "assistant": continue
+        for c in d.get("message", {}).get("content", []):
+            if c.get("type") != "tool_use": continue
+            if c["name"] in ("WebFetch", "WebSearch"):
+                suspect.append(f'{c["name"]}:{json.dumps(c.get("input"))[:120]}'); continue
+            if c["name"] != "Bash": continue
+            cmd = (c.get("input") or {}).get("command", ""); ncalls += 1
+            cmdlog.append(cmd.replace("\n", " ⏎ ")[:300])
+            if re.search(r"\b(pip3?|uv|poetry|pipx)\b.*\b(install|download|add)\b|curl|wget|"
+                         r"git\s+(clone|fetch|pull|remote)|pypi\.org|files\.pythonhosted|"
+                         r"github\.com|raw\.githubusercontent", cmd):
+                suspect.append(f"Bash:{cmd[:160]}")
+    open(f"{ROOT}/results/{slug}.cmds.txt","w").write("\n".join(cmdlog))
     diff = sh(["git","diff"], wt).stdout
     g = sh([VENV, f"{ROOT}/scripts/grade.py", wt, T])
     if r.returncode != 0:
         print(f"  (agent exited {r.returncode}: {r.stderr[-200:]})", file=sys.stderr)
     try: verdict = json.loads(g.stdout.strip().splitlines()[-1])
     except Exception: verdict = {"resolved": False, "error": "grader crashed", "raw": g.stdout[-400:] + g.stderr[-400:]}
-    os.makedirs(f"{ROOT}/results", exist_ok=True)
     rec = {"pr": int(pr), "model": model, "trial": int(trial), "title": task["title"], "elapsed_s": elapsed,
-           "agent_exit": r.returncode, "diff_lines": len(diff.splitlines()), **verdict}
+           "agent_exit": r.returncode, "diff_lines": len(diff.splitlines()),
+           "shell_calls": ncalls, "contamination_flags": suspect, **verdict}
     json.dump(rec, open(f"{ROOT}/results/{slug}.json","w"), indent=2)
     open(f"{ROOT}/results/{slug}.diff","w").write(diff)
     print(json.dumps(rec))

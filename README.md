@@ -67,6 +67,19 @@ Outcomes are read from pytest's JUnit XML rather than scraped from stdout,
 because `FAILED` lines carry a trailing ` - message` that makes text parsing
 ambiguous for parametrised ids containing spaces.
 
+### What the candidate could still cheat with, and how that is handled
+
+The candidate has a shell, and nothing in the sandbox prevents it from
+fetching a released version of the library that already contains the fix. So
+every shell command it runs is recorded to `results/<run>.cmds.txt` and
+screened for package installs, downloaders and anything reaching for
+PyPI or GitHub. A flagged run is reported as flagged rather than quietly
+counted — the screen is verified against known-bad and known-good commands
+so it neither misses an install nor trips on `python -m pytest`.
+
+This is detection, not prevention. The honest statement is that no attempt in
+the reported runs tripped the screen, not that cheating was impossible.
+
 ### Controls
 
 Every task is checked against three controls before it is allowed into the set:
