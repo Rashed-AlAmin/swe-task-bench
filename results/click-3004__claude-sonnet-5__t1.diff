@@ -1,0 +1,17 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 445460b..125ae1e 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -2884,6 +2884,12 @@ class Option(Parameter):
+                 default_string = ""
+             elif default_value == "":
+                 default_string = '""'
++            elif isinstance(self.type, types.Choice) and isinstance(
++                default_value, enum.Enum
++            ):
++                default_string = self.type.normalize_choice(
++                    choice=default_value, ctx=ctx
++                )
+             else:
+                 default_string = str(default_value)
+ 

@@ -1,0 +1,13 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index de129ec..e03c757 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -1575,6 +1575,8 @@ class Command:
+                     sys.exit(1)
+                 else:
+                     raise
++        except KeyboardInterrupt:
++            raise Abort()
+         except Exit as e:
+             if standalone_mode:
+                 sys.exit(e.exit_code)

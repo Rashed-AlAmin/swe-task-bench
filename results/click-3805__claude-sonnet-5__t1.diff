@@ -1,0 +1,15 @@
+diff --git a/src/click/_utils.py b/src/click/_utils.py
+index 05ee2e9..4c700f2 100644
+--- a/src/click/_utils.py
++++ b/src/click/_utils.py
+@@ -12,8 +12,8 @@ class Sentinel(enum.Enum):
+         `PEP 661 - Sentinel Values <https://peps.python.org/pep-0661/>`_.
+     """
+ 
+-    UNSET = object()
+-    FLAG_NEEDS_VALUE = object()
++    UNSET = enum.auto()
++    FLAG_NEEDS_VALUE = enum.auto()
+ 
+     def __repr__(self) -> str:
+         return f"{self.__class__.__name__}.{self.name}"

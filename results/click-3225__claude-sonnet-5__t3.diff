@@ -1,0 +1,33 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 23d1dd5..e7755d8 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -2281,12 +2281,19 @@ class Parameter:
+         name = self.name
+         value = ctx.lookup_default(name, call=False) if name is not None else None
+ 
++        from_default = False
++
+         if value is None and not (
+             ctx.default_map is not None and name is not None and name in ctx.default_map
+         ):
+             value = self.default
++            from_default = True
+ 
+-        if call and callable(value):
++        if (
++            call
++            and callable(value)
++            and not (from_default and getattr(self, "_flag_value_is_default", False))
++        ):
+             value = value()
+ 
+         return value
+@@ -2827,6 +2834,7 @@ class Option(Parameter):
+         # https://github.com/pallets/click/pull/3030/commits/06847da
+         if self.default is True and self.flag_value is not UNSET:
+             self.default = self.flag_value
++            self._flag_value_is_default = True
+ 
+         # Set the default flag_value if it is not set.
+         if self.flag_value is UNSET:

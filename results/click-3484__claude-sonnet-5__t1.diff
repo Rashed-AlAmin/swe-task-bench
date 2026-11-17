@@ -1,0 +1,28 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 3544c03..94ae8b8 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -2609,6 +2609,12 @@ class Parameter(ABC):
+         with augment_usage_errors(ctx, param=self):
+             value, source = self.consume_value(ctx, opts)
+ 
++            # Record the source before processing the value so that
++            # ``Context.get_parameter_source`` reflects where this value came
++            # from while ``convert()`` and the callback run below, instead of
++            # whatever was last recorded for this name (often ``None``).
++            ctx.set_parameter_source(self.name, source)
++
+             # Display a deprecation warning if necessary.
+             if (
+                 self.deprecated
+@@ -2662,6 +2668,10 @@ class Parameter(ABC):
+             # Nothing has claimed the slot yet. Record at least our source so downstream
+             # lookups don't return ``None``.
+             ctx.set_parameter_source(self.name, source)
++        else:
++            # Another parameter already claims the slot. Undo the tentative
++            # source set above, which was only there for convert()/callback().
++            ctx.set_parameter_source(self.name, existing_source)
+ 
+         return value, args
+ 

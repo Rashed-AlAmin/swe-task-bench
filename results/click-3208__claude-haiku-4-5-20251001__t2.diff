@@ -1,0 +1,28 @@
+diff --git a/src/click/exceptions.py b/src/click/exceptions.py
+index 4d782ee..cb80aa6 100644
+--- a/src/click/exceptions.py
++++ b/src/click/exceptions.py
+@@ -78,10 +78,19 @@ class UsageError(ClickException):
+             self.ctx is not None
+             and self.ctx.command.get_help_option(self.ctx) is not None
+         ):
+-            hint = _("Try '{command} {option}' for help.").format(
+-                command=self.ctx.command_path, option=self.ctx.help_option_names[0]
+-            )
+-            hint = f"{hint}\n"
++            available_names = set(self.ctx.command.get_help_option_names(self.ctx))
++            option = None
++            for name in self.ctx.help_option_names:
++                if name in available_names:
++                    option = name
++                    break
++            if option is None and self.ctx.help_option_names:
++                option = self.ctx.help_option_names[0]
++            if option:
++                hint = _("Try '{command} {option}' for help.").format(
++                    command=self.ctx.command_path, option=option
++                )
++                hint = f"{hint}\n"
+         if self.ctx is not None:
+             color = self.ctx.color
+             echo(f"{self.ctx.get_usage()}\n{hint}", file=file, color=color)

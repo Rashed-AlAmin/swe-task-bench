@@ -1,0 +1,31 @@
+diff --git a/src/click/utils.py b/src/click/utils.py
+index b529eb0..cdc8128 100644
+--- a/src/click/utils.py
++++ b/src/click/utils.py
+@@ -90,7 +90,25 @@ def _make_default_short_help(help: str, max_length: int = 45) -> str:
+             break
+ 
+         if word[-1] == ".":  # sentence end, truncate without "..."
+-            return " ".join(words[: i + 1])
++            # For potential abbreviations (lowercase word + period), check if
++            # the next word starts with lowercase. If so, don't treat as sentence end.
++            # This handles cases like "vs. pears" or "e.g. something".
++            word_without_period = word[:-1]
++            is_likely_abbreviation = (
++                word_without_period and
++                word_without_period[0].islower() and
++                not word_without_period[0].isdigit()
++            )
++
++            has_lowercase_next = (
++                i + 1 < len(words) and
++                words[i + 1] and
++                words[i + 1][0].islower()
++            )
++
++            # Treat as sentence end only if NOT (likely abbreviation AND lowercase next word)
++            if not (is_likely_abbreviation and has_lowercase_next):
++                return " ".join(words[: i + 1])
+ 
+         if total_length == max_length and i != last_index:
+             break  # not at sentence end, truncate with "..."

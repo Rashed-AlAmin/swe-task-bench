@@ -69,16 +69,33 @@ ambiguous for parametrised ids containing spaces.
 
 ### What the candidate could still cheat with, and how that is handled
 
-The candidate has a shell, and nothing in the sandbox prevents it from
-fetching a released version of the library that already contains the fix. So
-every shell command it runs is recorded to `results/<run>.cmds.txt` and
-screened for package installs, downloaders and anything reaching for
-PyPI or GitHub. A flagged run is reported as flagged rather than quietly
-counted — the screen is verified against known-bad and known-good commands
-so it neither misses an install nor trips on `python -m pytest`.
+The candidate has a shell, so it can try to fetch a released version of the
+library that already contains the fix. This is not hypothetical: in an earlier
+sweep the screen caught four runs doing exactly that — `pip download
+click==8.5.1 --no-binary :all:` followed by unpacking the sdist, and
+`pip install click==8.3.0` into a scratch venv. Those runs were discarded.
 
-This is detection, not prevention. The honest statement is that no attempt in
-the reported runs tripped the screen, not that cheating was impossible.
+Two measures now apply, in this order.
+
+**Prevention.** The agent is launched with every proxy variable pointing at a
+dead local port, with only the Anthropic API exempted via `NO_PROXY` so the
+agent itself can run. `pip` and `curl` inherit this and fail to reach PyPI.
+`PYTHONPATH` is set to the worktree's `src/`, mirroring the grader, so the
+suite is runnable offline and nothing needs installing in the first place.
+This is verified by a probe run that asks an agent to fetch a package and
+reports the refusal.
+
+**Detection.** Every shell command is still recorded to
+`results/<run>.cmds.txt` and screened for package installs, downloaders and
+anything reaching for PyPI or GitHub. A flagged run is reported as flagged
+rather than quietly counted — the screen is verified against known-bad and
+known-good commands so it neither misses an install nor trips on
+`python -m pytest`.
+
+The limit of this is worth stating plainly: the block is environmental, not a
+kernel sandbox. An agent that noticed the proxy variables and unset them could
+still reach the network. That is what the screen remains in place to catch, and
+why flagged runs are excluded rather than trusted.
 
 ### Controls
 

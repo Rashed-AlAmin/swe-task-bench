@@ -1,0 +1,22 @@
+diff --git a/src/click/utils.py b/src/click/utils.py
+index b529eb0..7ca4cb7 100644
+--- a/src/click/utils.py
++++ b/src/click/utils.py
+@@ -90,6 +90,17 @@ def _make_default_short_help(help: str, max_length: int = 45) -> str:
+             break
+ 
+         if word[-1] == ".":  # sentence end, truncate without "..."
++            # Only treat as sentence end if next word starts with uppercase or we're at the end
++            # For multi-character words (like "vs." or "e.g."), check if next word is lowercase
++            if i == last_index:
++                return " ".join(words[: i + 1])
++            if len(word) > 2 and words[i + 1][0].islower():
++                # Multi-character word with lowercase next word, likely abbreviation
++                continue
++            if words[i + 1][0].isupper():
++                # Next word is capitalized, so this is a sentence boundary
++                return " ".join(words[: i + 1])
++            # Single character or other case - treat as sentence boundary
+             return " ".join(words[: i + 1])
+ 
+         if total_length == max_length and i != last_index:

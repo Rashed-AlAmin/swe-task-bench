@@ -1,0 +1,23 @@
+diff --git a/src/click/shell_completion.py b/src/click/shell_completion.py
+index 5bebb5a..dc8817b 100644
+--- a/src/click/shell_completion.py
++++ b/src/click/shell_completion.py
+@@ -407,10 +407,14 @@ class FishComplete(ShellComplete):
+         incomplete = os.environ["COMP_CWORD"]
+         args = cwords[1:]
+ 
+-        # Fish stores the partial word in both COMP_WORDS and
+-        # COMP_CWORD, remove it from complete args.
+-        if incomplete and args and args[-1] == incomplete:
+-            args.pop()
++        # Fish stores the partial word in both COMP_WORDS and COMP_CWORD.
++        # Remove the incomplete word from args by getting it from cwords
++        # (after quote processing) instead of relying on COMP_CWORD, which may
++        # include quotes that have been stripped during split_arg_string processing.
++        if incomplete and args:
++            # incomplete has content, so remove it from args
++            # and use the quote-processed version
++            incomplete = args.pop()
+ 
+         return args, incomplete
+ 

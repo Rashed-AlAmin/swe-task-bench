@@ -1,0 +1,39 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 4e011f0..0fa8c6d 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -1074,11 +1074,11 @@ class Command:
+ 
+     def get_help_option_names(self, ctx: Context) -> list[str]:
+         """Returns the names for the help option."""
+-        all_names = set(ctx.help_option_names)
++        reserved_names = set()
+         for param in self.params:
+-            all_names.difference_update(param.opts)
+-            all_names.difference_update(param.secondary_opts)
+-        return list(all_names)
++            reserved_names.update(param.opts)
++            reserved_names.update(param.secondary_opts)
++        return [name for name in ctx.help_option_names if name not in reserved_names]
+ 
+     def get_help_option(self, ctx: Context) -> Option | None:
+         """Returns the help option object.
+diff --git a/src/click/exceptions.py b/src/click/exceptions.py
+index 4d782ee..2f8035d 100644
+--- a/src/click/exceptions.py
++++ b/src/click/exceptions.py
+@@ -78,8 +78,13 @@ class UsageError(ClickException):
+             self.ctx is not None
+             and self.ctx.command.get_help_option(self.ctx) is not None
+         ):
++            help_option_names = self.ctx.command.get_help_option_names(self.ctx)
++            option = next(
++                (name for name in help_option_names if name.startswith("--")),
++                help_option_names[0],
++            )
+             hint = _("Try '{command} {option}' for help.").format(
+-                command=self.ctx.command_path, option=self.ctx.help_option_names[0]
++                command=self.ctx.command_path, option=option
+             )
+             hint = f"{hint}\n"
+         if self.ctx is not None:

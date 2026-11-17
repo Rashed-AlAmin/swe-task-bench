@@ -1,0 +1,22 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 23d1dd5..fbbe06b 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -2896,6 +2896,17 @@ class Option(Parameter):
+             result += f" (env var: '{self.envvar}')"
+         return result
+ 
++    def get_default(
++        self, ctx: Context, call: bool = True
++    ) -> t.Any | t.Callable[[], t.Any] | None:
++        # A flag's default is one of its ``flag_value``s, a literal value to
++        # use as-is, not a factory to call, even if that value happens to be
++        # callable (e.g. a class used as ``flag_value``).
++        if self.is_flag:
++            call = False
++
++        return super().get_default(ctx, call=call)
++
+     def _parse_decls(
+         self, decls: cabc.Sequence[str], expose_value: bool
+     ) -> tuple[str | None, list[str], list[str]]:

@@ -1,0 +1,18 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 445460b..12a6c12 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -2870,6 +2870,13 @@ class Option(Parameter):
+         if show_default_is_str or (show_default and (default_value is not None)):
+             if show_default_is_str:
+                 default_string = f"({self.show_default})"
++            elif isinstance(self.type, types.Choice):
++                if isinstance(default_value, (list, tuple)):
++                    default_string = ", ".join(
++                        self.type.normalize_choice(d, ctx) for d in default_value
++                    )
++                else:
++                    default_string = self.type.normalize_choice(default_value, ctx)
+             elif isinstance(default_value, (list, tuple)):
+                 default_string = ", ".join(str(d) for d in default_value)
+             elif inspect.isfunction(default_value):

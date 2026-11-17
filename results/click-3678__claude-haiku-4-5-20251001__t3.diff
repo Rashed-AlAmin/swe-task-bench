@@ -1,0 +1,26 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 6de4216..dd622bd 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -1146,7 +1146,20 @@ class Command:
+         for param in self.params:
+             all_names.difference_update(param.opts)
+             all_names.difference_update(param.secondary_opts)
+-        return list(all_names)
++
++        # Also check if the derived name from the help option string would
++        # conflict with an existing parameter's name. For example, if we have
++        # an argument named "help" and the help option is "--help", the derived
++        # name would be "help", causing a conflict.
++        param_names = {param.name for param in self.params}
++        filtered_names = []
++        for name in all_names:
++            # Derive what the internal parameter name would be
++            derived_name = name.lstrip("-").replace("-", "_").lower()
++            if derived_name not in param_names:
++                filtered_names.append(name)
++
++        return filtered_names
+ 
+     def get_help_option(self, ctx: Context) -> Option | None:
+         """Returns the help option object.

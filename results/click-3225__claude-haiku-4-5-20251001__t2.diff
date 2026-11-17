@@ -1,0 +1,79 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 23d1dd5..15a0713 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -3239,6 +3239,25 @@ class Option(Parameter):
+ 
+         return rv
+ 
++    def get_default(
++        self, ctx: Context, call: bool = True
++    ) -> t.Any | t.Callable[[], t.Any] | None:
++        """Get the default for this option.
++
++        For flags with a flag_value, the flag_value should not be called
++        even if it is callable, since it is intended as a constant value.
++
++        :meta private:
++        """
++        value = super().get_default(ctx, call=False)
++
++        # For flags, never call the flag_value even if it is callable.
++        # The flag_value is a constant that should be used as-is.
++        if call and callable(value) and not (self.is_flag and value is self.flag_value):
++            value = value()
++
++        return value
++
+     def consume_value(
+         self, ctx: Context, opts: cabc.Mapping[str, Parameter]
+     ) -> tuple[t.Any, ParameterSource]:
+diff --git a/tests/test_options.py b/tests/test_options.py
+index b162a96..abaeedb 100644
+--- a/tests/test_options.py
++++ b/tests/test_options.py
+@@ -2166,7 +2166,7 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
+             {"flag_value": Class1, "default": True},
+             {"flag_value": Class2},
+             [],
+-            re.compile(r"'<test_options.Class1 object at 0x[0-9A-Fa-f]+>'"),
++            "<class 'test_options.Class1'>",
+         ),
+         (
+             {"flag_value": Class1, "default": True},
+@@ -2188,7 +2188,7 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
+             {"flag_value": Class1, "type": UNPROCESSED, "default": True},
+             {"flag_value": Class2, "type": UNPROCESSED},
+             [],
+-            re.compile(r"<test_options.Class1 object at 0x[0-9A-Fa-f]+>"),
++            Class1,
+         ),
+         (
+             {"flag_value": Class1, "type": UNPROCESSED, "default": True},
+@@ -2202,14 +2202,13 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
+             ["--opt2"],
+             Class2,
+         ),
+-        # Setting the default to a class, an instance of the class is returned instead
+-        # of the class itself, because the default is allowed to be callable (and
+-        # consummd). And this happens whatever the type is.
++        # Setting the default to a class. If it's the same as flag_value, it's not
++        # called. If it's different, the callable default is called.
+         (
+             {"flag_value": Class1, "default": Class1},
+             {"flag_value": Class2},
+             [],
+-            re.compile(r"'<test_options.Class1 object at 0x[0-9A-Fa-f]+>'"),
++            "<class 'test_options.Class1'>",
+         ),
+         (
+             {"flag_value": Class1, "default": Class2},
+@@ -2221,7 +2220,7 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
+             {"flag_value": Class1, "type": UNPROCESSED, "default": Class1},
+             {"flag_value": Class2, "type": UNPROCESSED},
+             [],
+-            re.compile(r"<test_options.Class1 object at 0x[0-9A-Fa-f]+>"),
++            Class1,
+         ),
+         (
+             {"flag_value": Class1, "type": UNPROCESSED, "default": Class2},

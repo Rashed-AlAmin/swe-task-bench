@@ -1,0 +1,33 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index de129ec..b0c34ea 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -1561,7 +1561,13 @@ class Command:
+                     # by its truthiness/falsiness
+                     ctx.exit()
+             except (EOFError, KeyboardInterrupt) as e:
+-                echo(file=sys.stderr)
++                try:
++                    echo(file=sys.stderr)
++                except KeyboardInterrupt:
++                    # A second Ctrl-C while reporting the first one. Ignore
++                    # it so this still turns into a clean `Abort` instead of
++                    # an uncaught `KeyboardInterrupt`.
++                    pass
+                 raise Abort() from e
+             except ClickException as e:
+                 if not standalone_mode:
+@@ -1591,7 +1597,12 @@ class Command:
+         except Abort:
+             if not standalone_mode:
+                 raise
+-            echo(_("Aborted!"), file=sys.stderr)
++            try:
++                echo(_("Aborted!"), file=sys.stderr)
++            except KeyboardInterrupt:
++                # Another Ctrl-C while reporting the abort. The command is
++                # already being aborted, so just proceed to exit.
++                pass
+             sys.exit(1)
+ 
+     def _main_shell_completion(

@@ -1,0 +1,13 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index de129ec..aeadf2d 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -1588,7 +1588,7 @@ class Command:
+                 # `ctx.exit(1)` and to `return 1`, the caller won't be able to
+                 # tell the difference between the two
+                 return e.exit_code
+-        except Abort:
++        except (KeyboardInterrupt, Abort):
+             if not standalone_mode:
+                 raise
+             echo(_("Aborted!"), file=sys.stderr)

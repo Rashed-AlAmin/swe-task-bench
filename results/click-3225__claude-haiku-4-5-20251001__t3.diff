@@ -1,0 +1,112 @@
+diff --git a/pyproject.toml b/pyproject.toml
+index 601bbe6..7908e55 100644
+--- a/pyproject.toml
++++ b/pyproject.toml
+@@ -80,6 +80,7 @@ default-groups = ["dev", "pre-commit", "tests", "typing"]
+ 
+ [tool.pytest.ini_options]
+ testpaths = ["tests"]
++pythonpath = ["src"]
+ filterwarnings = [
+     "error",
+ ]
+diff --git a/src/click/core.py b/src/click/core.py
+index 23d1dd5..f5dd848 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -2890,6 +2890,33 @@ class Option(Parameter):
+         )
+         return info_dict
+ 
++    def get_default(
++        self, ctx: Context, call: bool = True
++    ) -> t.Any | t.Callable[[], t.Any] | None:
++        """Get the default for the parameter.
++
++        For flag options with a flag_value, don't call callable defaults.
++        This prevents classes used as flag_value or default from being
++        instantiated, allowing the user to instantiate them with custom
++        parameters.
++
++        :meta private:
++        """
++        name = self.name
++        value = ctx.lookup_default(name, call=False) if name is not None else None
++
++        if value is None and not (
++            ctx.default_map is not None and name is not None and name in ctx.default_map
++        ):
++            value = self.default
++
++        # For flag options with a flag_value, don't call callable defaults.
++        # This prevents unintended instantiation of classes used as defaults.
++        if call and callable(value) and not (self.is_flag and self.flag_value is not UNSET):
++            value = value()
++
++        return value
++
+     def get_error_hint(self, ctx: Context) -> str:
+         result = super().get_error_hint(ctx)
+         if self.show_envvar and self.envvar is not None:
+diff --git a/tests/test_options.py b/tests/test_options.py
+index b162a96..6e52c69 100644
+--- a/tests/test_options.py
++++ b/tests/test_options.py
+@@ -2166,7 +2166,7 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
+             {"flag_value": Class1, "default": True},
+             {"flag_value": Class2},
+             [],
+-            re.compile(r"'<test_options.Class1 object at 0x[0-9A-Fa-f]+>'"),
++            "<class 'test_options.Class1'>",
+         ),
+         (
+             {"flag_value": Class1, "default": True},
+@@ -2188,7 +2188,7 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
+             {"flag_value": Class1, "type": UNPROCESSED, "default": True},
+             {"flag_value": Class2, "type": UNPROCESSED},
+             [],
+-            re.compile(r"<test_options.Class1 object at 0x[0-9A-Fa-f]+>"),
++            Class1,
+         ),
+         (
+             {"flag_value": Class1, "type": UNPROCESSED, "default": True},
+@@ -2202,32 +2202,32 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
+             ["--opt2"],
+             Class2,
+         ),
+-        # Setting the default to a class, an instance of the class is returned instead
+-        # of the class itself, because the default is allowed to be callable (and
+-        # consummd). And this happens whatever the type is.
++        # Setting the default to a class, the class is returned as-is (not instantiated).
++        # This is consistent with the flag_value behavior - classes are returned
++        # as-is and can be instantiated by the user if needed.
+         (
+             {"flag_value": Class1, "default": Class1},
+             {"flag_value": Class2},
+             [],
+-            re.compile(r"'<test_options.Class1 object at 0x[0-9A-Fa-f]+>'"),
++            "<class 'test_options.Class1'>",
+         ),
+         (
+             {"flag_value": Class1, "default": Class2},
+             {"flag_value": Class2},
+             [],
+-            re.compile(r"'<test_options.Class2 object at 0x[0-9A-Fa-f]+>'"),
++            "<class 'test_options.Class2'>",
+         ),
+         (
+             {"flag_value": Class1, "type": UNPROCESSED, "default": Class1},
+             {"flag_value": Class2, "type": UNPROCESSED},
+             [],
+-            re.compile(r"<test_options.Class1 object at 0x[0-9A-Fa-f]+>"),
++            Class1,
+         ),
+         (
+             {"flag_value": Class1, "type": UNPROCESSED, "default": Class2},
+             {"flag_value": Class2, "type": UNPROCESSED},
+             [],
+-            re.compile(r"<test_options.Class2 object at 0x[0-9A-Fa-f]+>"),
++            Class2,
+         ),
+         # Having the flag value set to integer is automaticcally recognized by Click.
+         (

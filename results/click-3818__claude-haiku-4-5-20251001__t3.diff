@@ -1,0 +1,16 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index de129ec..2e6493f 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -1561,7 +1561,10 @@ class Command:
+                     # by its truthiness/falsiness
+                     ctx.exit()
+             except (EOFError, KeyboardInterrupt) as e:
+-                echo(file=sys.stderr)
++                try:
++                    echo(file=sys.stderr)
++                except (EOFError, KeyboardInterrupt):
++                    pass
+                 raise Abort() from e
+             except ClickException as e:
+                 if not standalone_mode:

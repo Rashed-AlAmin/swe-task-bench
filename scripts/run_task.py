@@ -59,10 +59,26 @@ def main():
         "commit","-q","-m","base"], wt, check=True)
     problem = open(f"{T}/problem.md").read()
     t0 = time.time()
+    # Screening caught Sonnet runs that did `pip download click==8.5.1` and
+    # unpacked a release containing the fix. Detection is not enough, so egress
+    # is blackholed at the env level: every proxy variable points at a dead
+    # port, with only the Anthropic API exempted so the agent itself can run.
+    # PYTHONPATH mirrors scripts/runner.py, which makes the worktree source
+    # importable - so the suite is runnable offline and nothing needs pip.
+    # An agent that noticed and unset these could still reach the network;
+    # that is what the shell-command screen remains in place to catch.
+    DEAD = "http://127.0.0.1:9"
+    KEEP = "api.anthropic.com,.anthropic.com,localhost,127.0.0.1"
+    env = {**os.environ,
+           "http_proxy": DEAD, "https_proxy": DEAD, "HTTP_PROXY": DEAD,
+           "HTTPS_PROXY": DEAD, "ALL_PROXY": DEAD, "all_proxy": DEAD,
+           "no_proxy": KEEP, "NO_PROXY": KEEP,
+           "PYTHONPATH": f"{wt}/src"}
     r = sh(["claude","-p",PROMPT.format(problem=problem),"--model",model,
             "--permission-mode","acceptEdits","--max-turns",str(MAX_TURNS),
             "--output-format","stream-json","--verbose",
-            "--allowedTools","Read","Edit","Write","Grep","Glob","Bash"], cwd=wt, timeout=1800)
+            "--allowedTools","Read","Edit","Write","Grep","Glob","Bash"],
+           cwd=wt, timeout=1800, env=env)
     elapsed = round(time.time()-t0, 1)
     os.makedirs(f"{ROOT}/results", exist_ok=True)
     open(f"{ROOT}/results/{slug}.jsonl","w").write(r.stdout)

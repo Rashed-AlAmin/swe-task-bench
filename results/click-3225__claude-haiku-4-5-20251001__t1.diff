@@ -1,0 +1,76 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 23d1dd5..2b35db3 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -2825,7 +2825,8 @@ class Option(Parameter):
+         # and a flag_value set to something else. Refs:
+         # https://github.com/pallets/click/issues/3024#issuecomment-3146199461
+         # https://github.com/pallets/click/pull/3030/commits/06847da
+-        if self.default is True and self.flag_value is not UNSET:
++        self._default_was_true = self.default is True and self.flag_value is not UNSET
++        if self._default_was_true:
+             self.default = self.flag_value
+ 
+         # Set the default flag_value if it is not set.
+@@ -2871,6 +2872,22 @@ class Option(Parameter):
+                 if self.is_flag:
+                     raise TypeError("'count' is not valid with 'is_flag'.")
+ 
++    def get_default(
++        self, ctx: Context, call: bool = True
++    ) -> t.Any | t.Callable[[], t.Any] | None:
++        """Get the default for the option. For flags with non-boolean flag values,
++        the flag_value itself should not be called as a function when the default
++        was originally True and replaced with flag_value.
++        """
++        value = super().get_default(ctx, call=False)
++
++        # Only skip calling the flag_value if the default was originally True
++        # and replaced with the flag_value. Otherwise, treat it like any callable.
++        if call and callable(value) and not (self._default_was_true and value is self.flag_value):
++            value = value()
++
++        return value
++
+     def to_info_dict(self) -> dict[str, t.Any]:
+         """
+         .. versionchanged:: 8.3.0
+@@ -3301,6 +3318,17 @@ class Option(Parameter):
+             value = self.prompt_for_value(ctx)
+             source = ParameterSource.PROMPT
+ 
++        # If the value is the flag_value from the default where default=True was
++        # replaced with flag_value, treat it as if it came from the command line.
++        if (
++            self.is_flag
++            and self._default_was_true
++            and value is self.flag_value
++            and value is not UNSET
++            and source in (ParameterSource.DEFAULT, ParameterSource.DEFAULT_MAP)
++        ):
++            source = ParameterSource.COMMANDLINE
++
+         return value, source
+ 
+     def process_value(self, ctx: Context, value: t.Any) -> t.Any:
+@@ -3317,6 +3345,20 @@ class Option(Parameter):
+ 
+             return value
+ 
++        # For flags where default=True was replaced with flag_value, skip type
++        # conversion for callable flag_values (but not built-in types).
++        if (
++            self.is_flag
++            and self._default_was_true
++            and value is self.flag_value
++            and callable(value)
++            and not isinstance(value, (bool, int, float, str, bytes, type(None)))
++        ):
++            if self.callback is not None:
++                value = self.callback(ctx, self, value)
++
++            return value
++
+         # in the normal case, rely on Parameter.process_value
+         return super().process_value(ctx, value)
+ 

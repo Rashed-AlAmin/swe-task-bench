@@ -1,0 +1,43 @@
+diff --git a/src/click/utils.py b/src/click/utils.py
+index b529eb0..2a0ae9b 100644
+--- a/src/click/utils.py
++++ b/src/click/utils.py
+@@ -59,6 +59,28 @@ def make_str(value: t.Any) -> str:
+     return str(value)
+ 
+ 
++#: Common abbreviations whose trailing "." should not be mistaken for
++#: the end of a sentence.
++_ABBREVIATIONS = {"e.g.", "i.e.", "etc.", "vs."}
++
++
++def _is_sentence_end(words: list[str], index: int) -> bool:
++    """Whether the word at ``index`` (which ends with ".") actually ends
++    a sentence, rather than being an abbreviation or a period that's
++    followed by a lowercase continuation of the same sentence.
++    """
++    word = words[index]
++
++    if word.lower() in _ABBREVIATIONS:
++        return False
++
++    if index == len(words) - 1:
++        return True
++
++    next_word = words[index + 1]
++    return next_word[:1].isupper()
++
++
+ def _make_default_short_help(help: str, max_length: int = 45) -> str:
+     """Returns a condensed version of help string.
+ 
+@@ -89,7 +111,8 @@ def _make_default_short_help(help: str, max_length: int = 45) -> str:
+         if total_length > max_length:  # too long, truncate
+             break
+ 
+-        if word[-1] == ".":  # sentence end, truncate without "..."
++        if word[-1] == "." and _is_sentence_end(words, i):
++            # sentence end, truncate without "..."
+             return " ".join(words[: i + 1])
+ 
+         if total_length == max_length and i != last_index:

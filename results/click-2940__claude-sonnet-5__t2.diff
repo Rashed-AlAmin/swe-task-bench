@@ -1,0 +1,57 @@
+diff --git a/CHANGES.rst b/CHANGES.rst
+index d2d2570..1ed7b73 100644
+--- a/CHANGES.rst
++++ b/CHANGES.rst
+@@ -24,6 +24,10 @@ Unreleased
+ -   Lazily import ``shutil``. :pr:`3023`
+ -   Properly forward exception information to resources registered with
+     ``click.core.Context.with_resource()``. :issue:`2447` :pr:`3058`
++-   Fix ``CliRunner`` turning normal end-of-input into an ``EOFError`` for any
++    code that iterates over ``sys.stdin`` directly (e.g. ``for line in file``),
++    which was incorrectly reported as ``Aborted!``. The ``EOFError`` behavior is
++    now scoped to the prompt/confirm input helpers that rely on it.
+ 
+ Version 8.2.2
+ -------------
+diff --git a/src/click/testing.py b/src/click/testing.py
+index 3d3cb17..f6f60b8 100644
+--- a/src/click/testing.py
++++ b/src/click/testing.py
+@@ -127,13 +127,6 @@ class _NamedTextIOWrapper(io.TextIOWrapper):
+     def mode(self) -> str:
+         return self._mode
+ 
+-    def __next__(self) -> str:  # type: ignore
+-        try:
+-            line = super().__next__()
+-        except StopIteration as e:
+-            raise EOFError() from e
+-        return line
+-
+ 
+ def make_input_stream(
+     input: str | bytes | t.IO[t.Any] | None, charset: str
+@@ -359,7 +352,10 @@ class CliRunner:
+         @_pause_echo(echo_input)  # type: ignore
+         def visible_input(prompt: str | None = None) -> str:
+             sys.stdout.write(prompt or "")
+-            val = next(text_input).rstrip("\r\n")
++            try:
++                val = next(text_input).rstrip("\r\n")
++            except StopIteration as e:
++                raise EOFError() from e
+             sys.stdout.write(f"{val}\n")
+             sys.stdout.flush()
+             return val
+@@ -368,7 +364,10 @@ class CliRunner:
+         def hidden_input(prompt: str | None = None) -> str:
+             sys.stdout.write(f"{prompt or ''}\n")
+             sys.stdout.flush()
+-            return next(text_input).rstrip("\r\n")
++            try:
++                return next(text_input).rstrip("\r\n")
++            except StopIteration as e:
++                raise EOFError() from e
+ 
+         @_pause_echo(echo_input)  # type: ignore
+         def _getchar(echo: bool) -> str:
