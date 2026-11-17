@@ -44,3 +44,55 @@ ran against the raw quoted string.
 Near-misses of this shape — right edit, wrong place in the sequence — are the
 most useful thing a task can produce, because they separate "knows the API"
 from "understands the order of operations".
+
+## click-3021 — fixed the symptom, removed the protection (Haiku 4.5)
+
+Passed 0 of 1 fail-to-pass. The most instructive miss in the set.
+
+Both the model and the maintainers changed the same two lines. The code
+deliberately writes the prompt in two pieces, and the comment above it says why:
+
+```python
+echo(text.rstrip(" "), nl=False, err=err)
+# Echo a space to stdout to work around an issue where
+# readline causes backspace to clear the whole line.
+return f(" ")
+```
+
+The last character must pass through the input function, or readline lets
+backspace wipe the line.
+
+**Gold** keeps the split and generalises it — print everything but the last
+character, pass the last character through:
+
+```python
+echo(text[:-1], nl=False, err=err)
+return f(text[-1:])
+```
+
+**The model** instead suppressed the space conditionally:
+
+```python
+echo(text.rstrip(" "), nl=False, err=err)
+return f(" " if text.endswith(" ") else "")
+```
+
+With no suffix it now passes an **empty** string through the input function.
+The reported symptom is gone and the readline workaround the comment describes
+is silently gone with it.
+
+The test encodes the invariant rather than the symptom — with
+`err=True` it asserts stdout receives `"x"` while stderr receives
+`"Prompt to stderr with no suffi"`, i.e. the final character is still routed
+through the input function:
+
+```python
+click.prompt("Prompt to stderr with no suffix", prompt_suffix="", err=True)
+assert out == "x"
+assert err == "Prompt to stderr with no suffi"
+```
+
+Diagnosable failure mode: **satisfied the report, not the invariant.** This is
+the task that most directly rewards reading the comment above the line you are
+changing, and it is the reason the candidate prompt says not to weaken existing
+behaviour to make a symptom go away.
