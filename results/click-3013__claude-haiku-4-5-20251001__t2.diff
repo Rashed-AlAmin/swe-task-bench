@@ -1,0 +1,48 @@
+diff --git a/src/click/shell_completion.py b/src/click/shell_completion.py
+index 5bebb5a..e957ca9 100644
+--- a/src/click/shell_completion.py
++++ b/src/click/shell_completion.py
+@@ -412,8 +412,43 @@ class FishComplete(ShellComplete):
+         if incomplete and args and args[-1] == incomplete:
+             args.pop()
+ 
++        incomplete = self._unquote_incomplete(incomplete)
+         return args, incomplete
+ 
++    @staticmethod
++    def _unquote_incomplete(incomplete: str) -> str:
++        """Remove shell quoting from an incomplete token.
++
++        Fish returns the token being typed with quote characters
++        included. We need to remove them so the completion function
++        can match against the actual values.
++        """
++        import shlex
++
++        if not incomplete:
++            return incomplete
++
++        # Check if the token has any quoting or escaping that needs handling
++        has_quote = incomplete[0] in ('"', "'")
++        has_escape = "\\" in incomplete
++
++        if has_quote or has_escape:
++            # Try to use shlex to properly unquote and unescape
++            try:
++                lex = shlex.shlex(incomplete, posix=True)
++                lex.whitespace_split = True
++                lex.commenters = ""
++                # Get the first token
++                token = next(lex, None)
++                if token is not None:
++                    return token
++            except ValueError:
++                # Incomplete quote - just remove the leading quote
++                if has_quote:
++                    return incomplete[1:]
++
++        return incomplete
++
+     def format_completion(self, item: CompletionItem) -> str:
+         if item.help:
+             return f"{item.type},{item.value}\t{item.help}"

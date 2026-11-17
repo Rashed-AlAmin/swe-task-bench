@@ -1,0 +1,19 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 445460b..62c491a 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -2884,6 +2884,14 @@ class Option(Parameter):
+                 default_string = ""
+             elif default_value == "":
+                 default_string = '""'
++            elif isinstance(self.type, types.Choice):
++                # For Choice type, use the normalized representation to match
++                # what's shown in the choice list (especially important for enums)
++                normed_mapping = self.type._normalized_mapping(ctx=ctx)
++                if default_value in normed_mapping:
++                    default_string = normed_mapping[default_value]
++                else:
++                    default_string = str(default_value)
+             else:
+                 default_string = str(default_value)
+ 

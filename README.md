@@ -108,11 +108,26 @@ no observable test outcome and were discarded.
 
 | Task | Fix size | F2P | P2P | Haiku 4.5 |
 |---|---|---:|---:|---|
-| [click-3299](https://github.com/pallets/click/pull/3299) | +1/-1 | 1 | 551 | ✅ 1/1 |
+| [click-2940](https://github.com/pallets/click/pull/2940) | +8/-9 | 3 | 12 | ✅ 1/1 |
+| [click-3004](https://github.com/pallets/click/pull/3004) | +2/-0 | 5 | 295 | ◐ 1/2 ⚠️ |
+| [click-3013](https://github.com/pallets/click/pull/3013) | +2/-0 | 1 | 51 | ◐ 1/2 |
+| [click-3021](https://github.com/pallets/click/pull/3021) | +12/-6 | 1 | 142 | ❌ 0/1 |
+| [click-3152](https://github.com/pallets/click/pull/3152) | +6/-3 | 2 | 535 | ✅ 1/1 |
+| [click-3208](https://github.com/pallets/click/pull/3208) | +5/-1 | 3 | 20 | ❌ 0/1 |
+| [click-3225](https://github.com/pallets/click/pull/3225) | +20/-6 | 7 | 577 | ❌ 0/1 ⚠️ |
+| [click-3299](https://github.com/pallets/click/pull/3299) | +1/-1 | 1 | 551 | ✅ 2/2 |
+| [click-3434](https://github.com/pallets/click/pull/3434) | +8/-0 | 7 | 28 | ✅ 1/1 |
+| [click-3484](https://github.com/pallets/click/pull/3484) | +12/-5 | 3 | 680 | ✅ 1/1 |
+| [click-3509](https://github.com/pallets/click/pull/3509) | +3/-2 | 6 | 724 | ✅ 1/1 |
+| [click-3678](https://github.com/pallets/click/pull/3678) | +44/-2 | 10 | 766 | ❌ 0/1 |
+| [click-3805](https://github.com/pallets/click/pull/3805) | +9/-0 | 3 | 7 | ✅ 1/1 |
+| [click-3818](https://github.com/pallets/click/pull/3818) | +52/-24 | 5 | 3 | ❌ 0/1 |
+| [click-3865](https://github.com/pallets/click/pull/3865) | +20/-32 | 6 | 30 | ❌ 0/1 |
+| [click-3884](https://github.com/pallets/click/pull/3884) | +13/-10 | 9 | 667 | ❌ 0/1 |
 
 ✅ solved in every trial · ◐ solved in some trials · ❌ never solved · ⚠️ broke existing tests in at least one trial
 
-**Haiku 4.5** — 100% of 1 attempts resolved · 1 tasks always, 0 sometimes, 0 never · 0 attempts broke existing tests · median 93s
+**Haiku 4.5** — 53% of 19 attempts resolved · 7 tasks always, 2 sometimes, 7 never · 2 attempts broke existing tests · median 158s
 
 ---
 

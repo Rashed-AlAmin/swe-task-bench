@@ -1,0 +1,18 @@
+{
+  "pr": 3208,
+  "model": "claude-haiku-4-5-20251001",
+  "trial": 2,
+  "title": "fix help hint showing shadowed option name",
+  "elapsed_s": 158.5,
+  "agent_exit": 0,
+  "diff_lines": 28,
+  "shell_calls": 35,
+  "contamination_flags": [],
+  "resolved": false,
+  "f2p_passed": 1,
+  "f2p_total": 3,
+  "p2p_broken": 0,
+  "p2p_total": 20,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": []
+}
