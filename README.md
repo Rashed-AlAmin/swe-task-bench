@@ -148,7 +148,14 @@ Stated plainly, because a benchmark that hides these is not worth reading:
 - **One upstream project.** Everything is `click`, so these results describe
   mid-size pure-Python CLI library code and nothing else.
 - **Small n.** With 16 tasks, a one-task difference is noise, not a finding.
-- **One attempt per task.** No pass@k, no retries, no temperature sweep.
+- **Three attempts per task.** Enough to separate "always solves" from
+  "sometimes solves", not enough for a confidence interval.
+- **A turn budget exists.** Each attempt gets 150 agent turns. The budget is
+  reported per run (`turns`, `truncated`) so a failure that merely ran out of
+  room is visible rather than silently counted as an inability to solve. An
+  earlier 60-turn budget cut off 28% of runs mid-work and was discarded: at
+  that cap the distribution of completed runs pressed against the ceiling
+  (median 46, max 55), which measures the harness, not the model.
 - **Contamination is possible.** These PRs are public and most merged in 2026;
   a model may have seen the fix. Recency lowers the risk, it does not remove it.
 - **Environment, not container.** The reported numbers were produced in a

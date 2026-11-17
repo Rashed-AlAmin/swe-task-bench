@@ -7,6 +7,10 @@ import fcntl, json, os, re, shutil, subprocess as sp, sys, time
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from screen import flag_for
 ROOT = os.path.expanduser("~/Desktop/swe-task-bench")
+# Turn budget. At 60, completed runs pressed right up against the ceiling
+# (median 46, max 55) and 28% were cut off mid-work, which measures the
+# harness rather than the model.
+MAX_TURNS = 150
 REPO, VENV = f"{ROOT}/repo", f"{ROOT}/.venv/bin/python"
 PROMPT = """You are fixing a bug in this Python repository (the `click` library).
 A user has filed the following report:
@@ -56,7 +60,7 @@ def main():
     problem = open(f"{T}/problem.md").read()
     t0 = time.time()
     r = sh(["claude","-p",PROMPT.format(problem=problem),"--model",model,
-            "--permission-mode","acceptEdits","--max-turns","60",
+            "--permission-mode","acceptEdits","--max-turns",str(MAX_TURNS),
             "--output-format","stream-json","--verbose",
             "--allowedTools","Read","Edit","Write","Grep","Glob","Bash"], cwd=wt, timeout=1800)
     elapsed = round(time.time()-t0, 1)
@@ -66,9 +70,12 @@ def main():
     # the library that already contains the fix, so every shell command it ran
     # is recorded and screened; a flagged run is reported, never silently kept.
     suspect, ncalls, cmdlog = [], 0, []
+    turns, stop_reason = None, None
     for line in r.stdout.splitlines():
         try: d = json.loads(line)
         except Exception: continue
+        if d.get("type") == "result":
+            turns, stop_reason = d.get("num_turns"), d.get("subtype")
         if d.get("type") != "assistant": continue
         for c in d.get("message", {}).get("content", []):
             if c.get("type") != "tool_use": continue
@@ -89,7 +96,9 @@ def main():
     except Exception: verdict = {"resolved": False, "error": "grader crashed", "raw": g.stdout[-400:] + g.stderr[-400:]}
     rec = {"pr": int(pr), "model": model, "trial": int(trial), "title": task["title"], "elapsed_s": elapsed,
            "agent_exit": r.returncode, "diff_lines": len(diff.splitlines()),
-           "shell_calls": ncalls, "contamination_flags": suspect, **verdict}
+           "shell_calls": ncalls, "turns": turns, "stop_reason": stop_reason,
+           "truncated": stop_reason == "error_max_turns",
+           "contamination_flags": suspect, **verdict}
     json.dump(rec, open(f"{ROOT}/results/{slug}.json","w"), indent=2)
     open(f"{ROOT}/results/{slug}.diff","w").write(diff)
     print(json.dumps(rec))
