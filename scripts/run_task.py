@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""run_task.py <PR#> <model>  — give one task to one model, then grade it.
+"""run_task.py <PR#> <model> [trial]  — give one task to one model, then grade it.
 The model gets the repo at the base commit plus the problem statement only.
 The new tests are applied afterwards, by grade.py, and are never visible to it.
 """
@@ -35,7 +35,8 @@ def sh(cmd, cwd=None, check=False, **kw):
 
 def main():
     pr, model = sys.argv[1], sys.argv[2]
-    T, slug = f"{ROOT}/tasks/click-{pr}", f"click-{pr}__{model}"
+    trial = sys.argv[3] if len(sys.argv) > 3 else "1"
+    T, slug = f"{ROOT}/tasks/click-{pr}", f"click-{pr}__{model}__t{trial}"
     task = json.load(open(f"{T}/task.json"))
     wt = f"{ROOT}/work/{slug}"
     # A git worktree shares the upstream object database, so a candidate could
@@ -63,7 +64,7 @@ def main():
     try: verdict = json.loads(g.stdout.strip().splitlines()[-1])
     except Exception: verdict = {"resolved": False, "error": "grader crashed", "raw": g.stdout[-400:] + g.stderr[-400:]}
     os.makedirs(f"{ROOT}/results", exist_ok=True)
-    rec = {"pr": int(pr), "model": model, "title": task["title"], "elapsed_s": elapsed,
+    rec = {"pr": int(pr), "model": model, "trial": int(trial), "title": task["title"], "elapsed_s": elapsed,
            "agent_exit": r.returncode, "diff_lines": len(diff.splitlines()), **verdict}
     json.dump(rec, open(f"{ROOT}/results/{slug}.json","w"), indent=2)
     open(f"{ROOT}/results/{slug}.diff","w").write(diff)

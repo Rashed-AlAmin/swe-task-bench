@@ -93,6 +93,14 @@ no observable test outcome and were discarded.
 
 <!--RESULTS-->
 
+| Task | Fix size | F2P | P2P | Haiku 4.5 |
+|---|---|---:|---:|---|
+| [click-3299](https://github.com/pallets/click/pull/3299) | +1/-1 | 1 | 551 | ✅ 1/1 |
+
+✅ solved in every trial · ◐ solved in some trials · ❌ never solved · ⚠️ broke existing tests in at least one trial
+
+**Haiku 4.5** — 100% of 1 attempts resolved · 1 tasks always, 0 sometimes, 0 never · 0 attempts broke existing tests · median 93s
+
 ---
 
 ## Reproducing
