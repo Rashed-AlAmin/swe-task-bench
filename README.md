@@ -61,13 +61,20 @@ ambiguous for parametrised ids containing spaces.
 
 ### Controls
 
-Every task is checked against two controls before it is allowed into the set:
+Every task is checked against three controls before it is allowed into the set:
 
 - **null** — an untouched tree must grade *not resolved*
 - **gold** — the maintainers' own patch must grade *resolved*
+- **cheat** — deleting the tests and leaving a stub that passes must *still*
+  grade not resolved, and must be flagged as tampering
 
-A task that fails either control is a broken ruler and is dropped. All tasks in
-this repo pass both. `scripts/controls.sh <pr>` reproduces this.
+A task that fails any of the three is a broken ruler and is dropped. All tasks
+in this repo pass all three. `scripts/controls.sh <pr>` reproduces it.
+
+The cheat control matters more than it looks. A grader that merely runs the
+test files it is handed will happily score a deleted test suite as a pass. This
+one restores `tests/` from the base commit before applying the official test
+patch, so tampering is reverted rather than rewarded.
 
 Of 30 mined candidates, 24 produced a usable fail-to-pass set; the rest changed
 no observable test outcome and were discarded.
@@ -96,13 +103,16 @@ Stated plainly, because a benchmark that hides these is not worth reading:
 
 - **One upstream project.** Everything is `click`, so these results describe
   mid-size pure-Python CLI library code and nothing else.
-- **Small n.** With 15 tasks, a one-task difference is noise, not a finding.
+- **Small n.** With 16 tasks, a one-task difference is noise, not a finding.
 - **One attempt per task.** No pass@k, no retries, no temperature sweep.
 - **Contamination is possible.** These PRs are public and most merged in 2026;
   a model may have seen the fix. Recency lowers the risk, it does not remove it.
-- **Environment, not container.** Tasks run in a pinned virtualenv on the host
-  rather than a sealed image, so results are reproducible on a comparable
-  machine, not bit-for-bit anywhere.
+- **Environment, not container.** The reported numbers were produced in a
+  pinned virtualenv on the host, not inside the supplied image, so they are
+  reproducible on a comparable machine rather than bit-for-bit anywhere.
+- **Timing sensitivity.** A few tasks exercise terminal, pager and interrupt
+  behaviour. Those were graded on an unloaded machine; a heavily loaded host
+  can turn them flaky in either direction.
 - **Only Claude models are measured here.** The harness is model-agnostic —
   `run_task.py` takes any command-line coding agent — but these numbers cover
   the models the author had access to.
