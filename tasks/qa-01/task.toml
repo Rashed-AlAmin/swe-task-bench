@@ -1,0 +1,67 @@
+# qa-01 — codebase question answering, judge-graded.
+#
+# Unlike the click-* tasks in this repo, nothing here is scored by running a
+# test suite. The agent produces prose, and two rubrics score it: rubric/
+# positive.toml (what a correct answer must contain) and rubric/negative.toml
+# (claims that disqualify it). golden.md is the reference answer those rubrics
+# were written against.
+
+schema_version = 1
+artifacts = ["instruction.md", "golden.md", "rubric/positive.toml", "rubric/negative.toml"]
+
+[task]
+name = "qa-01"
+description = """
+Explain why a click prompt built with an empty prompt_suffix still renders one
+trailing byte, why that byte lands on stdout even when err=True sends the rest
+of the prompt to stderr, and why varying the suffix or padding the prompt text
+changes nothing.
+"""
+
+[verifier]
+# The verifier runs the judge over the agent's answer file, not pytest.
+timeout_sec = 1800
+environment_mode = "offline"
+
+[verifier.env]
+ANSWER_FILE = "answer.md"
+
+[agent]
+timeout_sec = 3600
+user = "agent"
+
+[environment]
+build_timeout_sec = 1800
+os = "linux"
+cpus = 2
+memory_mb = 4096
+storage_mb = 8192
+gpus = 0
+network_mode = "none"
+allowed_hosts = []
+
+[metadata]
+task_type = "codebase_qa"
+category = "runtime_behavior"
+language = "python"
+difficulty = "hard"
+repository = "pallets/click"
+base_commit = "5f86603a84e12bdec1584c15c9f982740e613c45"
+
+# The question states symptoms as the reporter observed them. The agent should
+# take those observations as given and explain them, not relitigate whether
+# they happened.
+deference = "premise_acceptance"
+
+# The failure this task is built to catch: the mechanism is invisible to a
+# static read. The code that looks responsible is correct, and the line that
+# actually produces the byte never writes to a stream at all, so an answer
+# assembled from reading alone lands on the wrong cause. Both models in this
+# repo failed the paired code-fix task (click-3021) 0/3 for exactly that
+# reason.
+failure_model = "no_runtime_evidence"
+
+# Provenance: derived from pallets/click PR #3021. The same base commit backs
+# tasks/click-3021, which is the code-fix form of the same defect.
+source_pr = 3021
+paired_task = "click-3021"

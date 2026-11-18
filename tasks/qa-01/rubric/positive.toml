@@ -1,0 +1,211 @@
+# Comprehensiveness rubric for qa-01.
+#
+# Every row is scored independently against the model's answer. Rows are
+# written to be checkable without reading the source: each one states the
+# mechanism it is looking for and names the lines that establish it, so the
+# judge can confirm a claim rather than infer one. Line numbers are those of
+# the tree at base_commit; all of them were opened at that commit.
+
+[judge]
+mode = "batched"
+files = ["answer.md"]
+cwd = "/repo"
+prompt_template = "judge_prompt.md"
+timeout = 900
+
+[scoring]
+aggregation = "weighted"
+
+[[criterion]]
+id = "body-written-by-echo-stripped"
+name = "Prompt body goes out through click's own writer, with trailing spaces removed"
+type = "binary"
+weight = 1.0
+description = """
+The answer states that the bulk of the prompt string is written by click's own
+output helper, and that the string handed to it has had its trailing spaces
+stripped first: `src/click/termui.py:141` for `prompt`, and
+`src/click/termui.py:234` for `confirm`. Naming the stripping is what matters
+here; attributing the stray byte to it is handled by a separate row.
+
+PASS if the answer identifies the stripped-text write as the route for the
+prompt body and points at line 141 or line 234 (or both).
+FAIL if the answer never mentions that the text is stripped before being
+written, or claims the whole prompt including its final byte leaves through
+this one call.
+"""
+
+[[criterion]]
+id = "last-byte-is-the-input-argument"
+name = "The trailing byte is the input function's prompt argument, not output"
+type = "binary"
+weight = 1.5
+description = """
+The answer identifies the real source of the trailing byte: it is not written
+by click at all, it is the literal one-character string passed as the prompt
+argument of the function that reads the user's line —
+`return f(" ")` at `src/click/termui.py:144`, and
+`visible_prompt_func(" ")` at `src/click/termui.py:237`. The byte is a
+hard-coded constant in both places: it does not come from the prompt text and
+it does not come from the suffix.
+
+PASS if the answer locates the trailing byte at line 144 or line 237 and
+describes it as an argument to the input-reading call rather than as something
+click printed.
+FAIL if the answer leaves the trailing byte unexplained, or sources it from the
+prompt text, the suffix, or the output helper.
+"""
+
+[[criterion]]
+id = "builtin-input-writes-to-stdout"
+name = "That argument lands on stdout because the reader is the builtin input()"
+type = "binary"
+weight = 1.5
+description = """
+The answer closes the loop between the previous row and the observed stray
+byte: the callable invoked there defaults to Python's builtin `input`
+(`src/click/termui.py:30`), and `input()` writes its prompt argument to
+`sys.stdout` itself. That write never passes through click's stream selection,
+which is the only place the error-stream flag is consulted
+(`src/click/utils.py:267-271`). So the body's destination is configurable and
+the trailing byte's destination is not.
+
+PASS if the answer explains that the trailing byte reaches stdout because the
+builtin input function emits it, and that this is why the error flag cannot
+redirect it.
+FAIL if the answer asserts the byte goes to stdout without naming the mechanism,
+or claims click chooses stdout for it deliberately.
+"""
+
+[[criterion]]
+id = "concrete-stream-split"
+name = "States the actual split for the err=True case"
+type = "binary"
+weight = 1.0
+description = """
+The answer gives the concrete division for a prompt sent to the error stream
+with an empty suffix: the error stream receives the prompt text with its
+trailing spaces removed and nothing after it, while standard output receives
+exactly one byte. For the instruction's example that is `deploy>` on stderr and
+a single space character on stdout.
+
+PASS if the answer states both halves of the split, each tied to a named stream.
+FAIL if the answer describes the split only in general terms, gets a stream
+backwards, or claims more than one byte reaches stdout.
+"""
+
+[[criterion]]
+id = "suffix-is-not-dropped"
+name = "The suffix is concatenated correctly; the loss happens downstream"
+type = "binary"
+weight = 1.0
+description = """
+The answer makes clear that the suffix is not ignored at construction time: the
+prompt builder appends it faithfully (`src/click/termui.py:60-73`, in
+particular the `f"{prompt}{suffix}"` return at `src/click/termui.py:73`), and
+the call sites pass the caller's value through unchanged
+(`src/click/termui.py:156`, `src/click/termui.py:223`). Whatever the suffix
+contributed is lost afterwards, in the stripping step, not in the building step.
+
+PASS if the answer explicitly separates correct construction from later loss and
+cites the builder.
+FAIL if the answer treats the suffix as discarded, defaulted, or overridden
+during construction.
+"""
+
+[[criterion]]
+id = "trailing-whitespace-collapse"
+name = "Explains why different suffixes and different padding are indistinguishable"
+type = "binary"
+weight = 1.0
+description = """
+The answer accounts for observations 1 and 2 from the instruction with a single
+consequence of the strip-then-append-one-byte shape: every trailing space in
+the built prompt is removed and exactly one is reintroduced, so any number of
+trailing spaces — contributed by the text, by the suffix, or by both — collapses
+to one. That makes `""`, `" "` and `"   "` produce identical bytes, makes `":"`
+and `": "` produce identical bytes, and makes alignment padding written into
+the prompt text unrecoverable.
+
+PASS if the answer derives the indistinguishability of the suffix variants and
+the disappearance of the padding from the same collapse.
+FAIL if the answer explains only one of the two observations, or offers separate
+unrelated causes for them.
+"""
+
+[[criterion]]
+id = "confirm-has-its-own-copy"
+name = "confirm() repeats the structure in its own code, not by delegation"
+type = "binary"
+weight = 0.5
+description = """
+The answer notes that `confirm` does not reach the behaviour by calling
+`prompt`: it builds its own prompt (`src/click/termui.py:223-228`) and contains
+its own copy of the same two-step write (`src/click/termui.py:234` and
+`src/click/termui.py:237`). That is why the symptom appears identically in both
+entry points.
+
+PASS if the answer states that confirm carries a duplicate of the same code
+path, with a line reference into the confirm body.
+FAIL if the answer claims confirm delegates to prompt, or discusses only one of
+the two functions when the question asked about both.
+"""
+
+[[criterion]]
+id = "byte-has-a-purpose"
+name = "Identifies what the trailing byte is for and that removing it has a cost"
+type = "binary"
+weight = 1.0
+description = """
+The answer reports why a byte is being passed to the reader at all: the comment
+immediately above both call sites (`src/click/termui.py:142-143` and
+`src/click/termui.py:235-236`) states that it exists to work around a line-editor
+problem where backspace clears the whole line. The answer therefore treats the
+byte as load-bearing — passing an empty string in its place would remove the
+workaround, not merely tidy the output.
+
+PASS if the answer names the stated purpose of the byte and says that emitting
+nothing there would give the workaround up.
+FAIL if the answer presents the byte as a leftover, a bug with no purpose, or
+something that could be deleted at no cost.
+"""
+
+[[criterion]]
+id = "runtime-evidence"
+name = "Backs the claim with byte-level output from an actual run"
+type = "binary"
+weight = 1.5
+description = """
+The answer includes at least one command it actually executed in this tree and
+the verbatim output of that command, captured so that the two streams are
+distinguishable (redirected separately, or compared across two runs) and shown
+at byte level — an octal/hex dump, an explicit byte count, or an equivalent
+rendering that makes a lone trailing space visible. Reasoning presented as if it
+were output does not count; neither does output that merges the streams, since
+the whole point in dispute is which stream the byte is on.
+
+PASS if executed commands and their literal output are present, the streams are
+separated, and the byte is made visible rather than described.
+FAIL if there is no command output, if the output is paraphrased, or if stdout
+and stderr are shown merged only.
+"""
+
+[[criterion]]
+id = "hidden-input-variant"
+name = "Notes that the hidden-input path routes the byte differently"
+type = "binary"
+weight = 0.5
+description = """
+The answer observes that the reader is selected at
+`src/click/termui.py:137`, so with `hide_input=True` the byte is passed to the
+password helper (`src/click/termui.py:54-57`) instead of to the builtin reader.
+Because that helper writes its own prompt rather than going to stdout, the stray
+byte does not necessarily appear on standard output in that configuration.
+
+PASS if the answer distinguishes the hidden-input path and does not assume the
+byte always lands on stdout.
+FAIL if the answer states unconditionally that the byte always reaches stdout
+for every call, or is silent about hide_input while claiming to have covered all
+routes. An answer that simply does not discuss hide_input at all is a FAIL for
+this row only and does not affect the others.
+"""

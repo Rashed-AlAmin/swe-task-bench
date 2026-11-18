@@ -199,6 +199,17 @@ Stated plainly, because a benchmark that hides these is not worth reading:
   `run_task.py` takes any command-line coding agent — but these numbers cover
   the models the author had access to.
 
+## A judge-graded task
+
+[`tasks/qa-01`](tasks/qa-01) is a different genre from the 16 above. Instead of
+a patch scored by pytest, it asks a question about runtime behaviour and scores
+the prose answer against two rubrics: positive criteria the answer must satisfy,
+and negative criteria — specific wrong claims — that disqualify it. The question
+is the explanation form of `click-3021`, the task both models failed 0/3, and
+the negative criteria are drawn from what those six failed attempts actually
+claimed. Its README covers how the rubrics map onto fail-to-pass and
+pass-to-pass tests, and why a judge is weaker evidence than a test run.
+
 ## Author
 
 MD Rashed Al Amin — [github.com/Rashed-AlAmin](https://github.com/Rashed-AlAmin)

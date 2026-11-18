@@ -1,0 +1,126 @@
+# Negative rubric for qa-01.
+#
+# Each row describes a specific wrong claim, phrased in the positive: the judge
+# decides whether that claim is PRESENT in the answer. `negate = true` flips the
+# result, so an answer containing the claim scores zero on that row and an
+# answer free of it scores full marks.
+#
+# These are not hypothetical. Every row below is drawn from recorded attempts at
+# the paired code-fix task (tasks/click-3021), where six independent runs across
+# two models produced the same family of wrong answers.
+
+[judge]
+mode = "batched"
+files = ["answer.md"]
+cwd = "/repo"
+prompt_template = "judge_prompt.md"
+timeout = 900
+
+[scoring]
+aggregation = "weighted"
+
+[[criterion]]
+id = "blames-the-output-call"
+name = "Claims the output helper appends the trailing byte"
+type = "binary"
+weight = 1.0
+negate = true
+description = """
+The answer attributes the trailing byte to the call that writes the prompt body
+— saying click echoes a space after the text, or that the trailing-space removal
+at `src/click/termui.py:141` / `:234` is itself what produces the extra byte, or
+that deleting that removal would make the output match the requested suffix.
+That write emits stripped text and nothing else; the byte comes from the
+separate argument passed to the reader.
+
+PRESENT if the answer sources the trailing byte from the body write or proposes
+removing the stripping as the explanation or the cure.
+NOT PRESENT if the body write and the reader argument are kept distinct.
+"""
+
+[[criterion]]
+id = "empty-argument-is-the-whole-story"
+name = "Treats passing an empty string to the reader as a complete account"
+type = "binary"
+weight = 1.5
+negate = true
+description = """
+The answer concludes that the behaviour is fully explained, or fully corrected,
+by having the reader be handed an empty string when the built prompt does not
+already end in a space — conditioning on the trailing space, computing the
+stripped remainder, or branching early — without recognising that an empty
+argument emits nothing at all and so abandons the line-editor workaround the
+code exists to provide. This is the exact shape every recorded attempt
+converged on.
+
+PRESENT if the answer offers a conditional or empty argument as the account of
+record and does not say that an empty argument costs the workaround.
+NOT PRESENT if the answer either avoids that framing or explicitly names what an
+empty argument gives up.
+"""
+
+[[criterion]]
+id = "denies-the-split"
+name = "Denies that the prompt is torn across two streams"
+type = "binary"
+weight = 1.5
+negate = true
+description = """
+The answer states that with the error-stream flag set the entire prompt goes to
+the error stream, or that standard output stays empty, or explains the stray
+byte on standard output as a stream-buffering artefact, a terminal effect, or a
+consequence of the suffix value. The split is structural: the body's destination
+is chosen by click, the trailing byte's destination is chosen by the reader, and
+they are not the same choice.
+
+PRESENT if the answer asserts a single destination for the whole prompt, or
+explains the stdout byte by anything other than the reader writing it.
+NOT PRESENT if the answer reports the split and attributes each half correctly.
+"""
+
+[[criterion]]
+id = "suffix-never-concatenated"
+name = "Claims the suffix is dropped when the prompt is built"
+type = "binary"
+weight = 1.0
+negate = true
+description = """
+The answer says the suffix is ignored, overwritten, or replaced by a default
+during prompt construction — that an empty suffix never reaches the built
+string, or that the builder substitutes `": "` when given an empty value. The
+builder appends whatever it is given (`src/click/termui.py:73`); the empty
+suffix is honoured there and the discrepancy appears only afterwards.
+
+Scope note: an answer that says the suffix's *trailing spaces* cannot be
+recovered downstream, or that an empty suffix is indistinguishable from a
+single-space suffix in the final output, is describing the real collapse and
+must NOT be marked present here.
+
+PRESENT if the answer locates the loss in the construction step.
+NOT PRESENT if construction is described as faithful and the loss is placed
+later.
+"""
+
+[[criterion]]
+id = "test-runner-output-as-stream-evidence"
+name = "Uses the test runner's merged output as evidence about stream routing"
+type = "binary"
+weight = 1.0
+negate = true
+description = """
+The answer's evidence for where the trailing byte lands is `CliRunner`'s
+combined output attribute, and it concludes from that single string that the
+prompt arrives on one stream. That attribute merges the streams, so it cannot
+show the split; the runner also substitutes its own reader
+(`src/click/testing.py:353-365`), so the byte is written there by different code
+than in a real process.
+
+Scope note: using `CliRunner` alongside a genuine separated-stream run, or
+citing it to make the point that it hides the split, is legitimate and must NOT
+be marked present here.
+
+PRESENT if a merged runner output string is the basis for a claim about which
+stream receives what.
+NOT PRESENT if stream claims rest on separately captured streams from a real
+run.
+"""
