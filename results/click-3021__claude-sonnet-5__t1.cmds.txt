@@ -1,0 +1,10 @@
+git log --oneline -- src/click/termui.py | head -50
+grep -n -i "rstrip\|prompt_suffix\|backspace" -r src/click/*.rst CHANGES.rst 2>/dev/null
+grep -n -B5 -A5 "2092\|665" CHANGES.rst | head -80
+pip download click --no-deps -d /tmp/click_latest 2>&1 | tail -5; pip index versions click 2>&1 | head -5
+grep -rn "prompt_suffix\|def test_prompt\|def test_confirm" tests/test_termui.py | head -60
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ def shell(): ⏎     line = click.prompt('admin>', prompt_suffix='') ⏎     click.echo(f'ran {line}') ⏎  ⏎ runner = CliRunner() ⏎ result = runner.invoke(shell, input='statu
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ def cmd(): ⏎     line = click.prompt('Name') ⏎     click.echo(f'got {line}') ⏎  ⏎ runner = CliRunner() ⏎ result = runner.invoke(cmd, input='bob\n') ⏎ print(repr(result.o
+python3 -m pytest tests/test_termui.py -q 2>&1 | tail -30
+python3 -m pytest tests/ -q 2>&1 | tail -15
+python3 -m pytest tests/ -q --ignore=tests/test_basic.py 2>&1 | tail -15

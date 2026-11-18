@@ -1,0 +1,24 @@
+{
+  "pr": 3225,
+  "model": "claude-haiku-4-5-20251001",
+  "trial": 2,
+  "title": "Fix callable ``flag_value`` being instantiated when used as a default",
+  "elapsed_s": 349.6,
+  "agent_exit": 0,
+  "diff_lines": 42,
+  "shell_calls": 39,
+  "turns": 68,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": false,
+  "f2p_passed": 3,
+  "f2p_total": 7,
+  "p2p_broken": 1,
+  "p2p_total": 577,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [
+    "tests/test_options.py::test_callable_flag_value_show_default"
+  ],
+  "void": null
+}

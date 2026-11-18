@@ -1,0 +1,5 @@
+cat > /tmp/deploy.py << 'EOF' ⏎ import click ⏎  ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         click.echo(f"{param.name} origin={ctx.get_parameter_source(param.name)}") ⏎         return value ⏎  ⏎ @click.command() ⏎ @click.opti
+PYTHONPATH=src python3 -c " ⏎ import click ⏎ print(click.core.ParameterSource.DEFAULT, click.core.ParameterSource.COMMANDLINE) ⏎ "
+python3 -m pytest tests/ -q 2>&1 | tail -60
+python3 -m pytest tests/ -q -W "ignore::DeprecationWarning" -p "no:cacheprovider" 2>&1 | tail -80
+cat > /tmp/debugflag.py << 'EOF' ⏎ import click ⏎  ⏎ def debug_callback(ctx, param, value): ⏎     source = ctx.get_parameter_source(param.name) ⏎     click.echo(f"debug callback value={value} source={source}") ⏎     return value ⏎  ⏎ @click.command() ⏎ @click.option("--debug/--no-debug", default=Fal

@@ -1,26 +1,36 @@
 diff --git a/src/click/termui.py b/src/click/termui.py
-index dcbb222..635d4ab 100644
+index dcbb222..ae0377e 100644
 --- a/src/click/termui.py
 +++ b/src/click/termui.py
-@@ -141,7 +141,9 @@ def prompt(
-             echo(text.rstrip(" "), nl=False, err=err)
+@@ -138,10 +138,13 @@ def prompt(
+         try:
+             # Write the prompt separately so that we get nice
+             # coloring through colorama on Windows
+-            echo(text.rstrip(" "), nl=False, err=err)
++            prompt_text = text.rstrip(" ")
++            echo(prompt_text, nl=False, err=err)
              # Echo a space to stdout to work around an issue where
              # readline causes backspace to clear the whole line.
 -            return f(" ")
 +            # Only add the space if the original prompt ended with a space.
-+            space = " " if text.endswith(" ") else ""
-+            return f(space)
++            input_prefix = " " if text != prompt_text else ""
++            return f(input_prefix)
          except (KeyboardInterrupt, EOFError):
              # getpass doesn't print a newline if the user aborts input with ^C.
              # Allegedly this behavior is inherited from getpass(3).
-@@ -234,7 +236,9 @@ def confirm(
-             echo(prompt.rstrip(" "), nl=False, err=err)
+@@ -231,10 +234,13 @@ def confirm(
+         try:
+             # Write the prompt separately so that we get nice
+             # coloring through colorama on Windows
+-            echo(prompt.rstrip(" "), nl=False, err=err)
++            prompt_text = prompt.rstrip(" ")
++            echo(prompt_text, nl=False, err=err)
              # Echo a space to stdout to work around an issue where
              # readline causes backspace to clear the whole line.
 -            value = visible_prompt_func(" ").lower().strip()
 +            # Only add the space if the original prompt ended with a space.
-+            space = " " if prompt.endswith(" ") else ""
-+            value = visible_prompt_func(space).lower().strip()
++            input_prefix = " " if prompt != prompt_text else ""
++            value = visible_prompt_func(input_prefix).lower().strip()
          except (KeyboardInterrupt, EOFError):
              raise Abort() from None
          if value in ("y", "yes"):

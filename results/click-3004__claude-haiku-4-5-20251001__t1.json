@@ -1,0 +1,22 @@
+{
+  "pr": 3004,
+  "model": "claude-haiku-4-5-20251001",
+  "trial": 1,
+  "title": "Fix rendering of Enum choices' default",
+  "elapsed_s": 148.3,
+  "agent_exit": 0,
+  "diff_lines": 30,
+  "shell_calls": 35,
+  "turns": 46,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": true,
+  "f2p_passed": 5,
+  "f2p_total": 5,
+  "p2p_broken": 0,
+  "p2p_total": 295,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [],
+  "void": null
+}

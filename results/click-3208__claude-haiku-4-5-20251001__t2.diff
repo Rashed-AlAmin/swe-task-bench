@@ -1,8 +1,8 @@
 diff --git a/src/click/exceptions.py b/src/click/exceptions.py
-index 4d782ee..cb80aa6 100644
+index 4d782ee..02dc8a5 100644
 --- a/src/click/exceptions.py
 +++ b/src/click/exceptions.py
-@@ -78,10 +78,19 @@ class UsageError(ClickException):
+@@ -78,10 +78,22 @@ class UsageError(ClickException):
              self.ctx is not None
              and self.ctx.command.get_help_option(self.ctx) is not None
          ):
@@ -10,17 +10,20 @@ index 4d782ee..cb80aa6 100644
 -                command=self.ctx.command_path, option=self.ctx.help_option_names[0]
 -            )
 -            hint = f"{hint}\n"
-+            available_names = set(self.ctx.command.get_help_option_names(self.ctx))
-+            option = None
++            # Get the help option names that are available (not overridden by
++            # command parameters). Prefer longer names (--help) over short ones (-h).
++            available_help_names = self.ctx.command.get_help_option_names(self.ctx)
++            # Find the first available help option from the context's list, maintaining order
++            help_option = None
 +            for name in self.ctx.help_option_names:
-+                if name in available_names:
-+                    option = name
-+                    break
-+            if option is None and self.ctx.help_option_names:
-+                option = self.ctx.help_option_names[0]
-+            if option:
++                if name in available_help_names:
++                    help_option = name
++                    # Prefer long-form options (starting with --) if available
++                    if name.startswith("--"):
++                        break
++            if help_option:
 +                hint = _("Try '{command} {option}' for help.").format(
-+                    command=self.ctx.command_path, option=option
++                    command=self.ctx.command_path, option=help_option
 +                )
 +                hint = f"{hint}\n"
          if self.ctx is not None:

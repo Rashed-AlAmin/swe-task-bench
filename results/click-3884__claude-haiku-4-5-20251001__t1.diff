@@ -1,5 +1,5 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 9cf05a9..c35beb7 100644
+index 9cf05a9..3b80006 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
 @@ -3271,7 +3271,11 @@ class Option(Parameter):
@@ -7,11 +7,11 @@ index 9cf05a9..c35beb7 100644
          result = super().get_error_hint(ctx)
          if self.show_envvar and self.envvar is not None:
 -            result += f" (env var: '{self.envvar}')"
-+            envvar_str = self.envvar
-+            if isinstance(envvar_str, (list, tuple)):
-+                envvar_str = "', '".join(str(x) for x in envvar_str if x)
-+            if envvar_str:
-+                result += f" (env var: '{envvar_str}')"
++            if isinstance(self.envvar, str):
++                envvar_str = self.envvar
++            else:
++                envvar_str = "', '".join(str(d) for d in self.envvar)
++            result += f" (env var: '{envvar_str}')"
          return result
  
      def _parse_decls(
@@ -24,9 +24,9 @@ index 9cf05a9..c35beb7 100644
 +                        extra["envvars"] = (envvar,)
                  else:
 -                    extra["envvars"] = tuple(str(d) for d in envvar)
-+                    envvar_tuple = tuple(str(d) for d in envvar if d)
-+                    if envvar_tuple:
-+                        extra["envvars"] = envvar_tuple
++                    envvars_tuple = tuple(str(d) for d in envvar)
++                    if envvars_tuple:
++                        extra["envvars"] = envvars_tuple
  
          # Temporarily enable resilient parsing to avoid type casting
          # failing for the default. Might be possible to extend this to

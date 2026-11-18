@@ -1,0 +1,29 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t3 -type f -name "*.py" | head -20
+cat > test_enum_issue.py << 'EOF' ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ @click.command() ⏎ @click.option( ⏎     "--checksum", ⏎     type=click.Choice(HashType), ⏎     default=HashType.SHA1, ⏎     show_default=True, ⏎ ) ⏎ de
+which python3 && python3 test_enum_issue.py --help
+grep -n "class Choice" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t3/src/click/types.py
+grep -n "show_default\|get_help_record\|format_help" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t3/src/click/core.py | head -40
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t3/tests -name "*.py" -exec grep -l "enum\|Enum" {} \;
+grep -A 20 -B 5 "Choice.*enum\|enum.*Choice" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t3/tests/test_basic.py | head -100
+grep -n "class.*Enum\|enum.Enum" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t3/tests/test_basic.py
+cat > test_enum_issues.py << 'EOF' ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ class Level(enum.IntEnum): ⏎     LOW = 1 ⏎     HIGH = 2 ⏎  ⏎ @click.command() ⏎ @click.option( ⏎     "--checksum", ⏎     type=click.Choice(HashType), 
+python3 ../test_enum_issues.py --help
+python3 test_enum_issues.py --help
+python3 test_enum_issues.py --checksum MD5 --level HIGH
+python3 test_enum_issues.py
+cat > test_enum_string.py << 'EOF' ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(str, enum.Enum): ⏎     MD5 = "md5-algorithm" ⏎     SHA1 = "sha1-algorithm" ⏎  ⏎ @click.command() ⏎ @click.option( ⏎     "--checksum", ⏎     type=click.Choice(HashType), ⏎     default=HashType.SHA1, ⏎     show_default
+python3 test_enum_string.py --checksum MD5 && python3 test_enum_string.py
+cat > test_enum_multiple.py << 'EOF' ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎     SHA256 = enum.auto() ⏎  ⏎ @click.command() ⏎ @click.option( ⏎     "--checksums", ⏎     type=click.Choice(HashType), ⏎     multiple=True, ⏎     defa
+python3 test_enum_multiple.py && python3 test_enum_multiple.py --checksums MD5 --checksums SHA256
+python3 -m pytest tests/test_basic.py::test_choice_argument_enum -xvs
+python3 -m pytest tests/test_basic.py -k "choice" --tb=short 2>&1 | head -100
+python3 -m pytest tests/ -k "choice" --tb=short -W ignore::pytest.PytestRemovedIn10Warning 2>&1 | head -150
+python3 -m pytest tests/ -k "default" --tb=short -W ignore::pytest.PytestRemovedIn10Warning 2>&1 | tail -20
+python3 -m pytest tests/ -k "help" --tb=short -W ignore::pytest.PytestRemovedIn10Warning 2>&1 | tail -20
+python3 -m pytest tests/test_options.py --tb=short -W ignore::pytest.PytestRemovedIn10Warning 2>&1 | tail -20
+python3 -m pytest tests/ --tb=short -W ignore::pytest.PytestRemovedIn10Warning -q 2>&1 | tail -30
+cat > test_bug_report.py << 'EOF' ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ @click.command() ⏎ @click.option( ⏎     "--checksum", ⏎     type=click.Choice(HashType), ⏎     default=HashType.SHA1, ⏎     show_default=True, ⏎ ) ⏎ de
+cat > test_intenum_bug.py << 'EOF' ⏎ import enum ⏎ import click ⏎  ⏎ class Level(enum.IntEnum): ⏎     LOW = 1 ⏎     HIGH = 2 ⏎  ⏎ @click.command() ⏎ @click.option( ⏎     "--level", ⏎     type=click.Choice(Level), ⏎     default=Level.HIGH, ⏎     show_default=True, ⏎ ) ⏎ def cmd(level): ⏎     click.ec
+python3 test_intenum_bug.py --level LOW && python3 test_intenum_bug.py
+python3 test_bug_report.py --checksum InvalidChoice 2>&1
+rm test_enum_issue.py test_enum_issues.py test_enum_string.py test_enum_multiple.py test_bug_report.py test_intenum_bug.py

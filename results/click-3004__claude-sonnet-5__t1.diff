@@ -1,17 +1,32 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 445460b..125ae1e 100644
+index 445460b..b9ea038 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -2884,6 +2884,12 @@ class Option(Parameter):
-                 default_string = ""
+@@ -2867,11 +2867,17 @@ class Option(Parameter):
+         elif ctx.show_default is not None:
+             show_default = ctx.show_default
+ 
++        def _stringify_default(value: t.Any) -> str:
++            if isinstance(self.type, types.Choice):
++                return self.type.normalize_choice(value, ctx)
++
++            return str(value)
++
+         if show_default_is_str or (show_default and (default_value is not None)):
+             if show_default_is_str:
+                 default_string = f"({self.show_default})"
+             elif isinstance(default_value, (list, tuple)):
+-                default_string = ", ".join(str(d) for d in default_value)
++                default_string = ", ".join(_stringify_default(d) for d in default_value)
+             elif inspect.isfunction(default_value):
+                 default_string = _("(dynamic)")
+             elif self.is_bool_flag and self.secondary_opts:
+@@ -2885,7 +2891,7 @@ class Option(Parameter):
              elif default_value == "":
                  default_string = '""'
-+            elif isinstance(self.type, types.Choice) and isinstance(
-+                default_value, enum.Enum
-+            ):
-+                default_string = self.type.normalize_choice(
-+                    choice=default_value, ctx=ctx
-+                )
              else:
-                 default_string = str(default_value)
+-                default_string = str(default_value)
++                default_string = _stringify_default(default_value)
  
+             if default_string:
+                 extra["default"] = default_string

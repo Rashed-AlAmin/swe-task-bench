@@ -1,14 +1,14 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 3544c03..5fc5e40 100644
+index 3544c03..265fdb8 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
 @@ -2609,6 +2609,11 @@ class Parameter(ABC):
          with augment_usage_errors(ctx, param=self):
              value, source = self.consume_value(ctx, opts)
  
-+            # Set the parameter source early so that custom type converters can
-+            # access it via ctx.get_parameter_source(). This will be overwritten
-+            # later by the arbitration logic if needed.
++            # Set the parameter source early so it's available during type conversion.
++            # It may be overwritten later during slot arbitration, but it must be
++            # available when convert() is called.
 +            ctx.set_parameter_source(self.name, source)
 +
              # Display a deprecation warning if necessary.

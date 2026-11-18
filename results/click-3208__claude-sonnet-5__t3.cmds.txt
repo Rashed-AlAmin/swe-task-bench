@@ -1,0 +1,6 @@
+cat > /tmp/deployctl.py << 'EOF' ⏎ import click ⏎  ⏎ @click.group(context_settings={"help_option_names": ["-h", "--help"]}) ⏎ def deployctl(): ⏎     pass ⏎  ⏎ @deployctl.command() ⏎ @click.option("-h", "--host", default="localhost") ⏎ @click.argument("service") ⏎ def restart(host, service): ⏎     cl
+which python3 && python3 -c "import click; print(click.__file__)"
+python3 /tmp/deployctl.py restart; echo "---"; python3 /tmp/deployctl.py restart -h
+python3 -m pytest tests/ -q 2>&1 | tail -40
+python3 -m pytest tests/ -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -40
+rm -f /tmp/deployctl.py

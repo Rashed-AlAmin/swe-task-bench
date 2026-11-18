@@ -1,19 +1,17 @@
 diff --git a/src/click/_utils.py b/src/click/_utils.py
-index 05ee2e9..53aa088 100644
+index 05ee2e9..adcc935 100644
 --- a/src/click/_utils.py
 +++ b/src/click/_utils.py
-@@ -18,6 +18,16 @@ class Sentinel(enum.Enum):
+@@ -18,6 +18,14 @@ class Sentinel(enum.Enum):
      def __repr__(self) -> str:
          return f"{self.__class__.__name__}.{self.name}"
  
-+    def __reduce_ex__(self, protocol: int) -> tuple[t.Any, ...]:
-+        # The default Enum pickling round-trips through the member's value, but
-+        # these values are plain `object()` instances that aren't preserved by
-+        # pickling, so the lookup on unpickling fails. Pickle by name instead,
-+        # looking the singleton member back up via attribute access. This also
-+        # fixes `copy`/`deepcopy` on Python < 3.11, which fall back to
-+        # `__reduce_ex__` since `Enum` didn't define `__copy__`/`__deepcopy__`
-+        # until 3.11.
++    def __reduce_ex__(self, protocol: int) -> tuple[t.Any, t.Any]:
++        # The default Enum pickling reconstructs members by looking up
++        # their value. Since the values here are unique `object()`
++        # instances that don't survive a pickle/copy round-trip with
++        # their identity intact, that lookup fails. Reconstruct by name
++        # instead, which is stable across pickling and copying.
 +        return getattr, (self.__class__, self.name)
 +
  

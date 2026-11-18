@@ -1,0 +1,5 @@
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ print(repr(click.prompt.__module__)) ⏎ " && echo "status" | python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ line = click.prompt('admin>', prompt_suffix='') ⏎ print('GOT:', repr(line)) ⏎ " | cat -A
+echo "test" | python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ line = click.prompt('Name') ⏎ print('GOT:', repr(line)) ⏎ " | cat -A ⏎ echo "---" ⏎ echo "n" | python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ r = click.confirm('Wipe cache?', prompt_suffix=''
+python3 -m pytest tests/ -k "prompt or confirm" -q 2>&1 | tail -50
+ls tests/ | grep -i term ⏎ python3 -m pytest tests/test_termui.py -q 2>&1 | tail -60
+git diff

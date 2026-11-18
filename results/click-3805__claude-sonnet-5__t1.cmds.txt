@@ -1,0 +1,3 @@
+python -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import pickle, copy ⏎ import click ⏎ from click._utils import UNSET, Sentinel ⏎  ⏎ opt = click.Option(['--name']) ⏎ o2 = pickle.loads(pickle.dumps(opt)) ⏎ print('pickle name:', o2.name, 'default is UNSET:', o2.default is UNSET) ⏎  ⏎ o3 = copy.co
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import pickle, copy ⏎ import click ⏎ from click._utils import UNSET, Sentinel ⏎  ⏎ opt = click.Option(['--name']) ⏎ o2 = pickle.loads(pickle.dumps(opt)) ⏎ print('pickle name:', o2.name, 'default is UNSET:', o2.default is UNSET) ⏎  ⏎ o3 = copy.c
+python3 -m pytest tests/ -q 2>&1 | tail -30

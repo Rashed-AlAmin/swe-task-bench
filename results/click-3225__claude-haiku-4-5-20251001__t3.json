@@ -1,0 +1,28 @@
+{
+  "pr": 3225,
+  "model": "claude-haiku-4-5-20251001",
+  "trial": 3,
+  "title": "Fix callable ``flag_value`` being instantiated when used as a default",
+  "elapsed_s": 545.1,
+  "agent_exit": 0,
+  "diff_lines": 115,
+  "shell_calls": 66,
+  "turns": 120,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": false,
+  "f2p_passed": 5,
+  "f2p_total": 7,
+  "p2p_broken": 6,
+  "p2p_total": 577,
+  "tampered_with_tests": true,
+  "p2p_broken_ids": [
+    "tests/test_options.py::test_callable_flag_value_not_instantiated[opt_params4-args4-<test_options.Class1 object at 0x[0-9A-Fa-f]+>]",
+    "tests/test_options.py::test_callable_flag_value_not_instantiated[opt_params5-args5-<test_options.Class2 object at 0x[0-9A-Fa-f]+>]",
+    "tests/test_options.py::test_custom_type_flag_value_dual_options[opt1_params11-opt2_params11-args11-'<test_options.Class1 object at 0x[0-9A-Fa-f]+>']",
+    "tests/test_options.py::test_custom_type_flag_value_dual_options[opt1_params12-opt2_params12-args12-'<test_options.Class2 object at 0x[0-9A-Fa-f]+>']",
+    "tests/test_options.py::test_custom_type_flag_value_dual_options[opt1_params13-opt2_params13-args13-<test_options.Class1 object at 0x[0-9A-Fa-f]+>]"
+  ],
+  "void": null
+}

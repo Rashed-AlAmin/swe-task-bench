@@ -1,22 +1,42 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 23d1dd5..fbbe06b 100644
+index 23d1dd5..cd43df2 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -2896,6 +2896,17 @@ class Option(Parameter):
-             result += f" (env var: '{self.envvar}')"
-         return result
+@@ -2825,7 +2825,8 @@ class Option(Parameter):
+         # and a flag_value set to something else. Refs:
+         # https://github.com/pallets/click/issues/3024#issuecomment-3146199461
+         # https://github.com/pallets/click/pull/3030/commits/06847da
+-        if self.default is True and self.flag_value is not UNSET:
++        self._default_is_flag_value = self.default is True and self.flag_value is not UNSET
++        if self._default_is_flag_value:
+             self.default = self.flag_value
+ 
+         # Set the default flag_value if it is not set.
+@@ -2890,6 +2891,27 @@ class Option(Parameter):
+         )
+         return info_dict
  
 +    def get_default(
 +        self, ctx: Context, call: bool = True
 +    ) -> t.Any | t.Callable[[], t.Any] | None:
-+        # A flag's default is one of its ``flag_value``s, a literal value to
-+        # use as-is, not a factory to call, even if that value happens to be
-+        # callable (e.g. a class used as ``flag_value``).
-+        if self.is_flag:
-+            call = False
++        """Like :meth:`Parameter.get_default`, but avoids calling the
++        default when it was aligned to :attr:`flag_value` (because
++        ``default=True`` was given). That alignment is a literal sentinel
++        substitution, not the declaration of a lazy default factory, so it
++        must not be called even if ``flag_value`` happens to be callable
++        (for example, a class).
++        """
++        value = super().get_default(ctx, call=False)
 +
-+        return super().get_default(ctx, call=call)
++        if (
++            call
++            and callable(value)
++            and not (self._default_is_flag_value and value is self.flag_value)
++        ):
++            value = value()
 +
-     def _parse_decls(
-         self, decls: cabc.Sequence[str], expose_value: bool
-     ) -> tuple[str | None, list[str], list[str]]:
++        return value
++
+     def get_error_hint(self, ctx: Context) -> str:
+         result = super().get_error_hint(ctx)
+         if self.show_envvar and self.envvar is not None:

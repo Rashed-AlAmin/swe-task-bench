@@ -1,0 +1,7 @@
+cat > /tmp/repro_test.py << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ @click.argument("src", type=click.File("r"), default="-") ⏎ def importer(src): ⏎     for line in src: ⏎         click.echo(f"row: {line.strip()}") ⏎  ⏎ def test_importer(): ⏎     result = C
+PYTHONPATH=src python3 /tmp/repro_test.py
+cat > /tmp/repro_prompt.py << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ def greet(): ⏎     name = click.prompt("Name") ⏎     click.echo(f"Hello {name}") ⏎  ⏎ r = CliRunner().invoke(greet, [], input="") ⏎ print("empty input prompt:", repr(r.output), r.exit_cod
+python3 -m pytest tests/ -q 2>&1 | tail -40
+python3 -m pytest tests/ -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -40
+sed -n '100,170p' tests/test_chain.py
+rm -f /tmp/repro_test.py /tmp/repro_prompt.py

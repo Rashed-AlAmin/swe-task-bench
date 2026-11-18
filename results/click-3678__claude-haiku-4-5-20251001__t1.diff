@@ -1,25 +1,28 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 6de4216..7088364 100644
+index 6de4216..d720ac1 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -1146,6 +1146,20 @@ class Command:
-         for param in self.params:
-             all_names.difference_update(param.opts)
-             all_names.difference_update(param.secondary_opts)
-+
-+        # Avoid creating a help option if its derived name would conflict
-+        # with an existing parameter's name.
-+        param_names = {param.name for param in self.params}
-+        names_to_remove = set()
-+        for opt in all_names:
-+            # Derive the name from the option, using the same logic as Option._parse_decls
-+            prefix, value = _split_opt(opt)
-+            if prefix:
-+                derived_name = value.replace("-", "_").lower()
-+                if derived_name in param_names:
-+                    names_to_remove.add(opt)
-+
-+        all_names.difference_update(names_to_remove)
-         return list(all_names)
+@@ -1169,8 +1169,21 @@ class Command:
+             # Avoid circular import.
+             from .decorators import help_option
  
-     def get_help_option(self, ctx: Context) -> Option | None:
+-            # Apply help_option decorator and pop resulting option
+-            help_option(*help_option_names)(self)
++            # Collect existing parameter names to avoid collisions
++            existing_names = {param.name for param in self.params}
++
++            # Determine the name for the help option that won't collide
++            help_param_name = "help"
++            if help_param_name in existing_names:
++                # Find an alternative name if "help" collides
++                for candidate in ["__help__", "help_option", "__help_option__"]:
++                    if candidate not in existing_names:
++                        help_param_name = candidate
++                        break
++
++            # Apply help_option decorator with the explicit name
++            # and pop resulting option
++            help_option(help_param_name, *help_option_names)(self)
+             self._help_option = self.params.pop()  # type: ignore[assignment]
+ 
+         return self._help_option

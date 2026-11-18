@@ -1,18 +1,78 @@
+diff --git a/CHANGES.rst b/CHANGES.rst
+index efa23d3..b82ca5e 100644
+--- a/CHANGES.rst
++++ b/CHANGES.rst
+@@ -10,6 +10,9 @@ Unreleased
+     :issue:`2952` :pr:`2956`
+ -   Fix completion for the Z shell (``zsh``) for completion items containing
+     colons. :issue:`2703` :pr:`2846`
++-   Fix ``show_default`` for ``Choice`` with enum values rendering a default
++    like ``HashType.SHA1`` or a raw ``IntEnum`` number instead of the choice
++    name that is actually accepted on the command line.
+ 
+ Version 8.2.1
+ -------------
 diff --git a/src/click/core.py b/src/click/core.py
-index 445460b..12a6c12 100644
+index 445460b..ef08994 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -2870,6 +2870,13 @@ class Option(Parameter):
-         if show_default_is_str or (show_default and (default_value is not None)):
+@@ -2871,7 +2871,9 @@ class Option(Parameter):
              if show_default_is_str:
                  default_string = f"({self.show_default})"
-+            elif isinstance(self.type, types.Choice):
-+                if isinstance(default_value, (list, tuple)):
-+                    default_string = ", ".join(
-+                        self.type.normalize_choice(d, ctx) for d in default_value
-+                    )
-+                else:
-+                    default_string = self.type.normalize_choice(default_value, ctx)
              elif isinstance(default_value, (list, tuple)):
-                 default_string = ", ".join(str(d) for d in default_value)
+-                default_string = ", ".join(str(d) for d in default_value)
++                default_string = ", ".join(
++                    self.type.get_default_display(d, ctx) for d in default_value
++                )
              elif inspect.isfunction(default_value):
+                 default_string = _("(dynamic)")
+             elif self.is_bool_flag and self.secondary_opts:
+@@ -2885,7 +2887,7 @@ class Option(Parameter):
+             elif default_value == "":
+                 default_string = '""'
+             else:
+-                default_string = str(default_value)
++                default_string = self.type.get_default_display(default_value, ctx)
+ 
+             if default_string:
+                 extra["default"] = default_string
+diff --git a/src/click/types.py b/src/click/types.py
+index e71c1c2..13fbb3c 100644
+--- a/src/click/types.py
++++ b/src/click/types.py
+@@ -92,6 +92,20 @@ class ParamType:
+     def get_metavar(self, param: Parameter, ctx: Context) -> str | None:
+         """Returns the metavar default for this param if it provides one."""
+ 
++    def get_default_display(self, value: t.Any, ctx: Context | None) -> str:
++        """Convert a default value of this type to a string for display
++        in help text, such as for the ``show_default`` option.
++
++        The default implementation just calls :func:`str` on the value.
++        Subclasses can override this to render the value in a way that is
++        consistent with the strings this type otherwise accepts and shows,
++        for example :class:`Choice` renders enum defaults using the member
++        name rather than ``repr``.
++
++        .. versionadded:: 8.2.2
++        """
++        return str(value)
++
+     def get_missing_message(self, param: Parameter, ctx: Context | None) -> str | None:
+         """Optionally might return extra information about a missing
+         parameter.
+@@ -305,6 +319,14 @@ class Choice(ParamType, t.Generic[ParamTypeValue]):
+ 
+         return normed_value
+ 
++    def get_default_display(self, value: t.Any, ctx: Context | None) -> str:
++        normalized_mapping = self._normalized_mapping(ctx=ctx)
++
++        if value in normalized_mapping:
++            return normalized_mapping[value]
++
++        return str(value)
++
+     def get_metavar(self, param: Parameter, ctx: Context) -> str | None:
+         if param.param_type_name == "option" and not param.show_choices:  # type: ignore
+             choice_metavars = [

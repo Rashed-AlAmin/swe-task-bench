@@ -1,13 +1,49 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index de129ec..aeadf2d 100644
+index de129ec..b0007c3 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -1588,7 +1588,7 @@ class Command:
-                 # `ctx.exit(1)` and to `return 1`, the caller won't be able to
-                 # tell the difference between the two
-                 return e.exit_code
--        except Abort:
-+        except (KeyboardInterrupt, Abort):
+@@ -1576,22 +1576,33 @@ class Command:
+                 else:
+                     raise
+         except Exit as e:
++            try:
++                if standalone_mode:
++                    sys.exit(e.exit_code)
++                else:
++                    # in non-standalone mode, return the exit code
++                    # note that this is only reached if `self.invoke` above raises
++                    # an Exit explicitly -- thus bypassing the check there which
++                    # would return its result
++                    # the results of non-standalone execution may therefore be
++                    # somewhat ambiguous: if there are codepaths which lead to
++                    # `ctx.exit(1)` and to `return 1`, the caller won't be able to
++                    # tell the difference between the two
++                    return e.exit_code
++            except (EOFError, KeyboardInterrupt):
++                raise Abort()
++        except (EOFError, KeyboardInterrupt) as e:
+             if standalone_mode:
+-                sys.exit(e.exit_code)
++                raise Abort() from e
+             else:
+-                # in non-standalone mode, return the exit code
+-                # note that this is only reached if `self.invoke` above raises
+-                # an Exit explicitly -- thus bypassing the check there which
+-                # would return its result
+-                # the results of non-standalone execution may therefore be
+-                # somewhat ambiguous: if there are codepaths which lead to
+-                # `ctx.exit(1)` and to `return 1`, the caller won't be able to
+-                # tell the difference between the two
+-                return e.exit_code
++                raise
+         except Abort:
              if not standalone_mode:
                  raise
-             echo(_("Aborted!"), file=sys.stderr)
+-            echo(_("Aborted!"), file=sys.stderr)
++            try:
++                echo(_("Aborted!"), file=sys.stderr)
++            except (EOFError, KeyboardInterrupt):
++                pass
+             sys.exit(1)
+ 
+     def _main_shell_completion(

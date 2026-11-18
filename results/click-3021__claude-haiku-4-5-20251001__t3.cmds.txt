@@ -1,0 +1,27 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3021__claude-haiku-4-5-20251001__t3 -type f -name "*.py" | grep -E "(prompt|confirm)" | head -20
+ls -la /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3021__claude-haiku-4-5-20251001__t3/
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3021__claude-haiku-4-5-20251001__t3/src -type f -name "*.py" | head -20
+echo "status" | python test_bug.py 2>&1 | cat -A
+echo "status" | python3 test_bug.py 2>&1 | cat -A
+echo "status" | python3 test_bug.py 2>&1 | cat -A
+echo "status" | python3 test_normal.py 2>&1 | cat -A
+echo "y" | python3 test_confirm.py 2>&1 | cat -A
+echo "y" | python3 test_confirm_normal.py 2>&1 | cat -A
+printf "a\nb\nc\n" | python3 test_custom_suffix.py 2>&1 | cat -A
+python3 -m pytest tests/ -xvs 2>&1 | head -100
+python3 -m pytest tests/ -k "prompt" -xvs 2>&1 | head -150
+find tests -name "*.py" -exec grep -l "prompt\|confirm" {} \;
+python3 -m pytest tests/test_termui.py -xvs 2>&1 | head -200
+python3 -m pytest tests/test_termui.py -xvs 2>&1 | tail -20
+grep -r "prompt_suffix" tests/ | grep -E '=""|\'\'')'
+echo "status" | python3 test_bug.py 2>&1 | od -c | head -20
+echo "status" | python3 test_normal.py 2>&1 | od -c | head -20
+echo "y" | python3 test_confirm.py 2>&1 | od -c | head -20
+echo "y" | python3 test_confirm_normal.py 2>&1 | od -c | head -20
+rm test_bug.py test_normal.py test_confirm.py test_confirm_normal.py test_custom_suffix.py
+python3 -m pytest tests/test_termui.py -q
+python3 -m pytest tests/test_options.py tests/test_utils.py -q
+python3 final_test.py
+python3 final_test.py
+python3 final_test.py
+rm final_test.py

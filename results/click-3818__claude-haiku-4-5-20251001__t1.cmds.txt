@@ -1,0 +1,11 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t1 -type f -name "*.py" | grep -E "(src/|click)" | head -20
+python -m pytest tests/ -xvs -k "keyboard" 2>&1 | head -100
+python3 -m pytest tests/ -xvs -k "keyboard" 2>&1 | head -100
+python3 -m pytest tests/ -x --tb=short 2>&1 | tail -50
+python3 test_race_condition.py
+python3 test_race_condition.py
+python3 test_race_condition.py
+python3 -m pytest tests/ -x --tb=short 2>&1 | tail -60
+timeout 5 python3 test_deploy.py <<< "" 2>&1 || true
+rm /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t1/test_deploy.py /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t1/test_double_interrupt.py /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4
+python3 -m pytest tests/ -x 2>&1 | tail -20

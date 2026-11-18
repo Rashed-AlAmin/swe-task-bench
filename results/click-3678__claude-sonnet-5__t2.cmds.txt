@@ -1,0 +1,4 @@
+cat > /tmp/docs.py << 'EOF' ⏎ import click ⏎  ⏎ @click.command() ⏎ @click.argument("help") ⏎ def docs(help): ⏎     click.echo(f"showing docs for {help}") ⏎  ⏎ if __name__ == "__main__": ⏎     docs() ⏎ EOF ⏎ PYTHONPATH=src python3 /tmp/docs.py networking
+PYTHONPATH=src python3 /tmp/docs.py networking ⏎ echo "---help---" ⏎ PYTHONPATH=src python3 /tmp/docs.py --help
+cat > /tmp/docs2.py << 'EOF' ⏎ import click ⏎  ⏎ @click.command() ⏎ @click.option("--assist", "help") ⏎ @click.argument("extra", required=False) ⏎ def docs(help, extra): ⏎     click.echo(f"showing docs for {help}") ⏎  ⏎ if __name__ == "__main__": ⏎     docs() ⏎ EOF ⏎ PYTHONPATH=src python3 /tmp/docs
+PYTHONPATH=src python3 -m pytest tests/ -q 2>&1 | tail -40

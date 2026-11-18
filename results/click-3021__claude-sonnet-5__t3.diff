@@ -1,25 +1,19 @@
 diff --git a/src/click/termui.py b/src/click/termui.py
-index dcbb222..ca8e784 100644
+index dcbb222..af616ce 100644
 --- a/src/click/termui.py
 +++ b/src/click/termui.py
-@@ -138,10 +138,13 @@ def prompt(
+@@ -138,7 +138,10 @@ def prompt(
          try:
              # Write the prompt separately so that we get nice
              # coloring through colorama on Windows
 -            echo(text.rstrip(" "), nl=False, err=err)
--            # Echo a space to stdout to work around an issue where
--            # readline causes backspace to clear the whole line.
--            return f(" ")
-+            if text.endswith(" "):
-+                echo(text[:-1], nl=False, err=err)
-+                # Echo a space to stdout to work around an issue where
-+                # readline causes backspace to clear the whole line.
-+                return f(" ")
-+            echo(text, nl=False, err=err)
-+            return f("")
-         except (KeyboardInterrupt, EOFError):
-             # getpass doesn't print a newline if the user aborts input with ^C.
-             # Allegedly this behavior is inherited from getpass(3).
++            stripped = text.rstrip(" ")
++            echo(stripped, nl=False, err=err)
++            if stripped == text:
++                return f("")
+             # Echo a space to stdout to work around an issue where
+             # readline causes backspace to clear the whole line.
+             return f(" ")
 @@ -231,10 +234,14 @@ def confirm(
          try:
              # Write the prompt separately so that we get nice
@@ -28,14 +22,14 @@ index dcbb222..ca8e784 100644
 -            # Echo a space to stdout to work around an issue where
 -            # readline causes backspace to clear the whole line.
 -            value = visible_prompt_func(" ").lower().strip()
-+            if prompt.endswith(" "):
-+                echo(prompt[:-1], nl=False, err=err)
++            stripped = prompt.rstrip(" ")
++            echo(stripped, nl=False, err=err)
++            if stripped == prompt:
++                value = visible_prompt_func("").lower().strip()
++            else:
 +                # Echo a space to stdout to work around an issue where
 +                # readline causes backspace to clear the whole line.
 +                value = visible_prompt_func(" ").lower().strip()
-+            else:
-+                echo(prompt, nl=False, err=err)
-+                value = visible_prompt_func("").lower().strip()
          except (KeyboardInterrupt, EOFError):
              raise Abort() from None
          if value in ("y", "yes"):

@@ -1,8 +1,8 @@
 diff --git a/src/click/formatting.py b/src/click/formatting.py
-index d9075ca..96fe8d3 100644
+index d9075ca..d0c303b 100644
 --- a/src/click/formatting.py
 +++ b/src/click/formatting.py
-@@ -161,10 +161,13 @@ class HelpFormatter:
+@@ -161,30 +161,35 @@ class HelpFormatter:
          if prefix is None:
              prefix = "{usage} ".format(usage=_("Usage:"))
  
@@ -11,29 +11,49 @@ index d9075ca..96fe8d3 100644
          text_width = self.width - self.current_indent
  
 -        if text_width >= (term_len(usage_prefix) + 20):
+-            # The arguments will fit to the right of the prefix.
+-            indent = " " * term_len(usage_prefix)
+-            self.write(
+-                wrap_text(
+-                    args,
+-                    text_width,
+-                    initial_indent=usage_prefix,
+-                    subsequent_indent=indent,
 +        if args:
-+            usage_prefix = usage_prefix + " "
-+
-+        if args and text_width >= (term_len(usage_prefix) + 20):
-             # The arguments will fit to the right of the prefix.
-             indent = " " * term_len(usage_prefix)
-             self.write(
-@@ -175,7 +178,7 @@ class HelpFormatter:
-                     subsequent_indent=indent,
++            usage_prefix_with_space = f"{usage_prefix} "
++            if text_width >= (term_len(usage_prefix_with_space) + 20):
++                # The arguments will fit to the right of the prefix.
++                indent = " " * term_len(usage_prefix_with_space)
++                self.write(
++                    wrap_text(
++                        args,
++                        text_width,
++                        initial_indent=usage_prefix_with_space,
++                        subsequent_indent=indent,
++                    )
++                )
++            else:
++                # The prefix is too long, put the arguments on the next line.
++                self.write(usage_prefix_with_space)
++                self.write("\n")
++                indent = " " * (max(self.current_indent, term_len(prefix)) + 4)
++                self.write(
++                    wrap_text(
++                        args, text_width, initial_indent=indent, subsequent_indent=indent
++                    )
                  )
-             )
--        else:
-+        elif args:
-             # The prefix is too long, put the arguments on the next line.
+-            )
+         else:
+-            # The prefix is too long, put the arguments on the next line.
++            # No arguments, just write the prefix
              self.write(usage_prefix)
-             self.write("\n")
-@@ -185,6 +188,9 @@ class HelpFormatter:
-                     args, text_width, initial_indent=indent, subsequent_indent=indent
-                 )
-             )
-+        else:
-+            # No arguments, just write the usage line
-+            self.write(usage_prefix)
+-            self.write("\n")
+-            indent = " " * (max(self.current_indent, term_len(prefix)) + 4)
+-            self.write(
+-                wrap_text(
+-                    args, text_width, initial_indent=indent, subsequent_indent=indent
+-                )
+-            )
  
          self.write("\n")
  

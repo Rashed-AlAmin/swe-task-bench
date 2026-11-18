@@ -1,0 +1,6 @@
+python3 -c " ⏎ import pickle, click ⏎ opt = click.Option(['--name']) ⏎ print(pickle.loads(pickle.dumps(opt)).name) ⏎ " 2>&1 | tail -20
+python3 -c " ⏎ import pickle, copy, click ⏎ from click._utils import UNSET, FLAG_NEEDS_VALUE ⏎  ⏎ opt = click.Option(['--name']) ⏎ r = pickle.loads(pickle.dumps(opt)) ⏎ print('pickle option name:', r.name) ⏎  ⏎ print('pickle UNSET is same:', pickle.loads(pickle.dumps(UNSET)) is UNSET) ⏎ print('copy 
+cat > /tmp/repro_cmd.py << 'EOF' ⏎ import pickle, copy, click ⏎  ⏎ @click.command() ⏎ @click.option('--name') ⏎ def cli(name): ⏎     pass ⏎  ⏎ if __name__ == '__main__': ⏎     r2 = pickle.loads(pickle.dumps(cli)) ⏎     print('pickle command name:', r2.name) ⏎     print('copy command:', copy.deepcopy
+cat > /tmp/repro_cmd2.py << 'EOF' ⏎ import pickle, copy, click ⏎  ⏎ def _callback(name=None): ⏎     pass ⏎  ⏎ cli = click.Command('cli', params=[click.Option(['--name'])], callback=_callback) ⏎  ⏎ if __name__ == '__main__': ⏎     r2 = pickle.loads(pickle.dumps(cli)) ⏎     print('pickle command name:
+python3 -m pytest tests/ -q 2>&1 | tail -30
+rm -f /tmp/repro_cmd.py /tmp/repro_cmd2.py

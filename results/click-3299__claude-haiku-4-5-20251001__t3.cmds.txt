@@ -1,0 +1,18 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3299__claude-haiku-4-5-20251001__t3 -type f -name "*.py" | head -20
+python test_bug.py --help
+python3 test_bug.py --help
+grep -n "^UNSET = " src/click/core.py
+head -50 src/click/core.py | grep -E "^from|^import"
+grep -n "not in (None" src/click/core.py
+python3 test_bug.py --help
+python3 test_bug.py --help
+python3 test_bug.py
+python3 -m pytest tests/ -xvs 2>&1 | head -100
+python3 -m pytest tests/ -k "help or default" -xvs 2>&1 | head -150
+python3 -m pytest tests/ --ignore=tests/test_basic.py -k "help or default" -xvs 2>&1 | head -200
+python3 -m pytest tests/ --ignore=tests/test_basic.py -k "help or default" --tb=short 2>&1 | tail -50
+python3 test_bug.py --help && python3 test_bug.py
+python3 test_edge_cases.py
+rm test_bug.py test_edge_cases.py
+python3 -m pytest tests/test_options.py::test_show_default_string tests/test_options.py::test_show_default_with_empty_string -xvs
+git diff src/click/core.py

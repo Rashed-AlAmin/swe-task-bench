@@ -1,0 +1,22 @@
+{
+  "pr": 3884,
+  "model": "claude-haiku-4-5-20251001",
+  "trial": 1,
+  "title": "Fix `show_envvar` output for a sequence or an empty `envvar`",
+  "elapsed_s": 140.3,
+  "agent_exit": 0,
+  "diff_lines": 32,
+  "shell_calls": 21,
+  "turns": 43,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": false,
+  "f2p_passed": 5,
+  "f2p_total": 9,
+  "p2p_broken": 0,
+  "p2p_total": 667,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [],
+  "void": null
+}

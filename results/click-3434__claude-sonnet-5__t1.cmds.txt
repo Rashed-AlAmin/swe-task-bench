@@ -1,0 +1,5 @@
+python3 -c " ⏎ import textwrap ⏎ w = textwrap.TextWrapper(80, initial_indent='Usage: prog ', subsequent_indent='   ', replace_whitespace=False) ⏎ print(repr(w.fill(''))) ⏎ " ⏎ 
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     '''Cluster admin tools.''' ⏎  ⏎ @admin.command(options_metavar='') ⏎ def status(): ⏎     '''Show cluster status.''' ⏎     click.echo('ok') ⏎  ⏎ runner =
+python3 -m pytest tests/test_formatting.py tests/test_basic.py tests/test_options.py tests/test_context.py tests/test_commands.py tests/test_arguments.py -q 2>&1 | tail -30
+python3 -m pytest tests/test_formatting.py tests/test_options.py tests/test_context.py tests/test_commands.py tests/test_arguments.py -q -p no:cacheprovider -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -30
+python3 -m pytest tests/ -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -30

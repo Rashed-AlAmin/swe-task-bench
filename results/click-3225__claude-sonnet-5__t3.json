@@ -1,0 +1,22 @@
+{
+  "pr": 3225,
+  "model": "claude-sonnet-5",
+  "trial": 3,
+  "title": "Fix callable ``flag_value`` being instantiated when used as a default",
+  "elapsed_s": 416.2,
+  "agent_exit": 0,
+  "diff_lines": 42,
+  "shell_calls": 10,
+  "turns": 38,
+  "stop_reason": "success",
+  "truncated": false,
+  "void": null,
+  "contamination_flags": [],
+  "resolved": false,
+  "f2p_passed": 5,
+  "f2p_total": 7,
+  "p2p_broken": 0,
+  "p2p_total": 577,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": []
+}

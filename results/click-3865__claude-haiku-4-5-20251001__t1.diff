@@ -1,23 +1,17 @@
 diff --git a/src/click/utils.py b/src/click/utils.py
-index b529eb0..b13f264 100644
+index b529eb0..953ca1f 100644
 --- a/src/click/utils.py
 +++ b/src/click/utils.py
-@@ -89,8 +89,17 @@ def _make_default_short_help(help: str, max_length: int = 45) -> str:
-         if total_length > max_length:  # too long, truncate
+@@ -90,7 +90,12 @@ def _make_default_short_help(help: str, max_length: int = 45) -> str:
              break
  
--        if word[-1] == ".":  # sentence end, truncate without "..."
+         if word[-1] == ".":  # sentence end, truncate without "..."
 -            return " ".join(words[: i + 1])
-+        if word[-1] == ".":  # potential sentence end
 +            # Only treat as sentence end if:
-+            # - It's the last word, OR
-+            # - The next word (if it exists) starts with a capital letter
-+            is_last_word = i == last_index
-+            has_capital_following = (
-+                i + 1 < len(words) and len(words[i + 1]) > 0 and words[i + 1][0].isupper()
-+            )
-+
-+            if is_last_word or has_capital_following:
++            # 1. It's the last word, or
++            # 2. Next word starts with capital letter, or
++            # 3. Current word is a number (like in a list)
++            if i + 1 >= len(words) or words[i + 1][0].isupper() or word[0].isdigit():
 +                return " ".join(words[: i + 1])
  
          if total_length == max_length and i != last_index:

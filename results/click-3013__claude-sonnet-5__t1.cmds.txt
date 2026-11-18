@@ -1,0 +1,2 @@
+python3 -c " ⏎ import os, sys ⏎ sys.path.insert(0, 'src') ⏎ from click.shell_completion import FishComplete, split_arg_string ⏎  ⏎ class Dummy(FishComplete): ⏎     def __init__(self): ⏎         pass ⏎  ⏎ d = Dummy() ⏎  ⏎ cases = [ ⏎     ('importer --dataset \"Sa', '\"Sa'), ⏎     (\"importer --datase
+python3 -m pytest tests/test_shell_completion.py -q 2>&1 | tail -30

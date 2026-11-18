@@ -1,0 +1,4 @@
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     '''Cluster admin tools.''' ⏎  ⏎ @admin.command(options_metavar='') ⏎ def status(): ⏎     '''Show cluster status.''' ⏎     click.echo('ok') ⏎  ⏎ runner =
+python3 -m pytest tests/ -q 2>&1 | tail -30
+python3 -m pytest tests/ -q --ignore=tests/test_basic.py 2>&1 | tail -20
+git stash && python3 -m pytest tests/test_basic.py -q 2>&1 | tail -10; git stash pop

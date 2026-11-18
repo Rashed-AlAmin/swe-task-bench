@@ -1,0 +1,22 @@
+{
+  "pr": 2940,
+  "model": "claude-sonnet-5",
+  "trial": 3,
+  "title": "testing/CliRunner: Fix regression related to EOF introduced in 262bdf0",
+  "elapsed_s": 77.1,
+  "agent_exit": 0,
+  "diff_lines": 42,
+  "shell_calls": 5,
+  "turns": 11,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": true,
+  "f2p_passed": 3,
+  "f2p_total": 3,
+  "p2p_broken": 0,
+  "p2p_total": 12,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [],
+  "void": null
+}

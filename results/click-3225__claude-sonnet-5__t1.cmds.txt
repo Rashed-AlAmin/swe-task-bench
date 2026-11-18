@@ -1,0 +1,22 @@
+grep -n "def get_default\|def type_cast_value\|def process_value\|def value_from_envvar\|def resolve_envvar_value\|def full_process_value\|def handle_parse_result" src/click/core.py | head -50
+grep -n "get_default\|_flag_needs_value\|def consume_value\|class Option" src/click/core.py | sed -n '1,100p'
+cat > /tmp/export.py << 'EOF' ⏎ import click ⏎  ⏎ class JsonWriter: ⏎     """Takes a path, writes rows to it.""" ⏎  ⏎ @click.command() ⏎ @click.option("--json", "writer", flag_value=JsonWriter, ⏎               type=click.UNPROCESSED, default=True, show_default=True) ⏎ def export(writer): ⏎     click
+grep -rn "flag_value" docs/ CHANGES.rst 2>/dev/null | head -50
+grep -n "def get_default" -A 40 src/click/core.py | head -60
+grep -rn "is_flag" tests/*.py | grep -i "default=" | head -30
+sed -n '230,270p' tests/test_basic.py
+PYTHONPATH=src python3 /tmp/export.py --json ⏎ PYTHONPATH=src python3 /tmp/export.py ⏎ PYTHONPATH=src python3 /tmp/export.py --help
+cat > /tmp/export2.py << 'EOF' ⏎ import click ⏎  ⏎ class CsvWriter: ⏎     def __init__(self, delimiter): ⏎         self.delimiter = delimiter ⏎  ⏎ @click.command() ⏎ @click.option("--csv", "writer", flag_value=CsvWriter, ⏎               type=click.UNPROCESSED, default=True) ⏎ def export(writer): ⏎  
+python3 -m pytest tests/ -q 2>&1 | tail -40
+python3 -m pytest tests/ -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -40
+sed -n '2150,2270p' tests/test_options.py
+git stash && python3 -m pytest tests/test_options.py -k test_custom_type_flag_value_dual_options -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -20 && git stash pop
+python3 -m pytest tests/test_options.py -k test_custom_type_flag_value_dual_options -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -60
+python3 -c " ⏎ import tests.test_options as m ⏎ " 2>&1 | head -5 ⏎ python3 -m pytest tests/test_options.py -k test_custom_type_flag_value_dual_options --collect-only -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | head -40
+sed -n '1,70p' CHANGES.rst
+PYTHONPATH=src python3 /tmp/export.py --json ⏎ PYTHONPATH=src python3 /tmp/export.py ⏎ PYTHONPATH=src python3 /tmp/export.py --help ⏎ echo "---csv---" ⏎ PYTHONPATH=src python3 /tmp/export2.py ⏎ PYTHONPATH=src python3 /tmp/export2.py --csv
+python3 -m pytest tests/ -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -20
+sed -n '2080,2165p' tests/test_options.py
+sed -n '2165,2270p' tests/test_options.py
+git diff --stat && echo --- && git diff src/click/core.py
+echo "== JsonWriter, no flag ==" && python3 /tmp/export.py && echo "== JsonWriter, --json ==" && python3 /tmp/export.py --json && echo "== JsonWriter --help ==" && python3 /tmp/export.py --help && echo "== CsvWriter, no flag (should not raise) ==" && python3 /tmp/export2.py

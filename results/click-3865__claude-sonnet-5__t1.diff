@@ -1,28 +1,19 @@
 diff --git a/src/click/utils.py b/src/click/utils.py
-index b529eb0..e6c466c 100644
+index b529eb0..b2412ea 100644
 --- a/src/click/utils.py
 +++ b/src/click/utils.py
-@@ -89,8 +89,21 @@ def _make_default_short_help(help: str, max_length: int = 45) -> str:
+@@ -89,10 +89,13 @@ def _make_default_short_help(help: str, max_length: int = 45) -> str:
          if total_length > max_length:  # too long, truncate
              break
  
 -        if word[-1] == ".":  # sentence end, truncate without "..."
--            return " ".join(words[: i + 1])
-+        if word[-1] == ".":
-+            # A trailing "." only ends the sentence if it's the last word,
-+            # or the next word doesn't look like a continuation of the same
-+            # sentence (e.g. an abbreviation like "vs." or "e.g." followed
-+            # by a lowercase word). Periods after digits (e.g. list markers
-+            # like "9.") are still always treated as sentence ends.
-+            is_sentence_end = (
-+                i == last_index
-+                or not words[i + 1][0].islower()
-+                or any(ch.isdigit() for ch in word)
-+            )
-+
-+            if is_sentence_end:
-+                # sentence end, truncate without "..."
-+                return " ".join(words[: i + 1])
++        if word[-1] == "." and (i == last_index or words[i + 1][:1].isupper()):
++            # sentence end, truncate without "..."
+             return " ".join(words[: i + 1])
  
          if total_length == max_length and i != last_index:
++            if word[-1] == ".":  # happens to land on a dot, truncate without "..."
++                return " ".join(words[: i + 1])
              break  # not at sentence end, truncate with "..."
+     else:
+         return " ".join(words)  # no truncation needed

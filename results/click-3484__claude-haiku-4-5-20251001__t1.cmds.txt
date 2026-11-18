@@ -1,0 +1,43 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t1 -type f -name "*.py" | head -20
+cat > test_repro.py << 'EOF' ⏎ import click ⏎  ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         source = ctx.get_parameter_source(param.name) ⏎         click.echo(f"{param.name} origin={source}") ⏎         return value ⏎  ⏎ @clic
+python test_repro.py
+python3 test_repro.py
+git log --oneline -20
+git show 97b8827 --stat
+grep -r "get_parameter_source" tests/ --include="*.py" | head -10
+grep -A 20 "get_parameter_source" tests/test_context.py | head -30
+grep -B 10 -A 30 "get_parameter_source" tests/test_defaults.py
+grep -n "def test_default_map_source" tests/test_defaults.py
+cat > test_bug.py << 'EOF' ⏎ import click ⏎  ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         source = ctx.get_parameter_source(param.name) ⏎         click.echo(f"{param.name} origin={source}") ⏎         return value ⏎  ⏎ @click.
+python3 test_repro.py
+python3 test_repro.py --config ./staging.toml
+python3 -c "import click; print('DEFAULT:', click.ParameterSource.DEFAULT); print('COMMANDLINE:', click.ParameterSource.COMMANDLINE)"
+cat > test_eager_flag.py << 'EOF' ⏎ import click ⏎ import os ⏎  ⏎ def set_debug_callback(ctx, param, value): ⏎     # Only set the env var if the user explicitly passed the flag ⏎     source = ctx.get_parameter_source(param.name) ⏎     click.echo(f"{param.name} origin={source}, value={value}") ⏎     
+python3 test_eager_flag.py
+python3 test_eager_flag.py --debug
+python3 test_eager_flag.py --no-debug
+python3 -m pytest tests/test_defaults.py::test_default_map_source -xvs
+python3 -m pytest tests/test_context.py -xvs
+python3 -m pytest tests/ -x --tb=short 2>&1 | head -100
+python3 -m pytest tests/ --ignore=tests/test_basic.py -x --tb=short 2>&1 | tail -50
+cat > test_dual_option.py << 'EOF' ⏎ import click ⏎  ⏎ @click.command() ⏎ @click.option("--red", "color", flag_value="red") ⏎ @click.option("--green", "color", flag_value="green", default="green") ⏎ @click.pass_context ⏎ def cli(ctx, color): ⏎     source = ctx.get_parameter_source("color") ⏎     cli
+python3 test_dual_option.py --red
+python3 test_dual_option.py --green
+grep -n "class Argument" src/click/core.py | head -5
+grep -A 100 "class Argument" src/click/core.py | grep -n "def handle_parse_result" | head -5
+grep -n "def handle_parse_result" src/click/core.py
+head -2587 src/click/core.py | tail -50 | grep "^class "
+awk '/^class /{classname=$2} /def handle_parse_result/{print classname}' src/click/core.py
+grep -n "\.process_value(" src/click/core.py
+grep -n "ParameterSource.PROMPT" src/click/core.py
+python3 test_bug.py
+python3 test_bug.py --config ./staging.toml
+python3 test_repro.py
+cat > test_default_map.py << 'EOF' ⏎ import click ⏎  ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         source = ctx.get_parameter_source(param.name) ⏎         click.echo(f"{param.name} origin={source}") ⏎         return value ⏎  ⏎
+python3 -m pytest tests/ --ignore=tests/test_basic.py -q 2>&1 | tail -20
+rm test_repro.py test_bug.py test_eager_flag.py test_dual_option.py test_default_map.py
+cat > final_test.py << 'EOF' ⏎ import click ⏎ import os ⏎  ⏎ # Test 1: Custom param type getting parameter source ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         source = ctx.get_parameter_source(param.name) ⏎         if source 
+cat > final_test.py << 'EOF' ⏎ import click ⏎ import os ⏎  ⏎ # Test 1: Custom param type getting parameter source ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         source = ctx.get_parameter_source(param.name) ⏎         if source 
+rm final_test.py
+python3 -m pytest tests/test_context.py tests/test_defaults.py tests/test_options.py -q
+git diff src/click/core.py

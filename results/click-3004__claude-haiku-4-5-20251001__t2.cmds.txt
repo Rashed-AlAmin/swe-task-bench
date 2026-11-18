@@ -1,0 +1,22 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t2 -type f -name "*.py" | head -20
+python test_enum_bug.py --help
+python3 test_enum_bug.py --help
+grep -n "show_default" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t2/src/click/core.py | head -30
+python3 test_enum_bug.py --help
+python3 test_enum_int.py --help
+python3 test_enum_bug.py
+python3 test_enum_bug.py --checksum MD5
+python3 test_enum_int.py && python3 test_enum_int.py --priority LOW
+python3 test_string_default.py --help
+python3 test_enum_case_insensitive.py --help
+python3 -m pytest tests/ -xvs 2>&1 | head -100
+python3 -m pytest tests/test_types.py -xvs -k choice 2>&1 | head -150
+python3 -m pytest tests/ -xvs -k "default" 2>&1 | head -200
+python3 -m pytest tests/test_options.py -xvs 2>&1 | head -200
+python3 -m pytest tests/test_options.py -xvs 2>&1 | tail -50
+python3 -m pytest tests/test_types.py -xvs 2>&1 | tail -50
+python3 -m pytest tests/test_commands.py -xvs 2>&1 | tail -50
+python3 test_enum_comprehensive.py
+python3 test_non_enum_choices.py
+python3 test_enum_bug.py --help && echo "---" && python3 test_enum_bug.py --checksum SHA1
+rm -f test_*.py

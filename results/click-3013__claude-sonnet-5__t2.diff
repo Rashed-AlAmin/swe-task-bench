@@ -1,17 +1,19 @@
 diff --git a/src/click/shell_completion.py b/src/click/shell_completion.py
-index 5bebb5a..39a8913 100644
+index 5bebb5a..53d097d 100644
 --- a/src/click/shell_completion.py
 +++ b/src/click/shell_completion.py
-@@ -404,7 +404,11 @@ class FishComplete(ShellComplete):
- 
-     def get_completion_args(self) -> tuple[list[str], str]:
-         cwords = split_arg_string(os.environ["COMP_WORDS"])
--        incomplete = os.environ["COMP_CWORD"]
-+        # Fish gives the current token as typed, quotes and escapes
-+        # included. Parse it the same way as COMP_WORDS so that an
-+        # open quote or backslash escape doesn't prevent matching.
-+        incomplete_parts = split_arg_string(os.environ["COMP_CWORD"])
-+        incomplete = incomplete_parts[-1] if incomplete_parts else ""
+@@ -407,6 +407,14 @@ class FishComplete(ShellComplete):
+         incomplete = os.environ["COMP_CWORD"]
          args = cwords[1:]
  
++        # The current word may still contain an open quote or a
++        # backslash escape (e.g. '"Sales Q' or 'Sales\ Q') if the user
++        # hasn't finished typing it. Unquote/unescape it the same way
++        # COMP_WORDS was split so it lines up with the other args and
++        # with the unquoted value completion callbacks expect.
++        unquoted = split_arg_string(incomplete)
++        incomplete = unquoted[-1] if unquoted else ""
++
          # Fish stores the partial word in both COMP_WORDS and
+         # COMP_CWORD, remove it from complete args.
+         if incomplete and args and args[-1] == incomplete:

@@ -1,79 +1,27 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 6de4216..3916933 100644
+index 6de4216..01b7866 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -2422,6 +2422,16 @@ class Parameter(ABC):
+@@ -2334,8 +2334,11 @@ class Parameter(ABC):
  
-         return value
- 
-+    def _get_parser_dest(self) -> str:
-+        """Get the destination name to use in the parser.
-+
-+        For parameters with expose_value=False, we use an internal name
-+        to avoid conflicts with user-defined parameters.
-+        """
-+        if self.expose_value:
-+            return self.name
-+        return f"__{self.name}__"
-+
-     @abstractmethod
-     def add_to_parser(self, parser: _OptionParser, ctx: Context) -> None: ...
- 
-@@ -2439,7 +2449,7 @@ class Parameter(ABC):
-         :meta private:
+         .. versionadded:: 8.0
          """
-         # Collect from the parse the value passed by the user to the CLI.
--        value = opts.get(self.name, UNSET)
-+        value = opts.get(self._get_parser_dest(), UNSET)
-         # If the value is set, it means it was sourced from the command line by the
-         # parser, otherwise it left unset by default.
-         source = (
-@@ -3186,17 +3196,19 @@ class Option(Parameter):
-         else:
-             action = "store"
- 
-+        dest = self._get_parser_dest()
-+
-         if self.is_flag:
-             action = f"{action}_const"
- 
-             if self.is_bool_flag and self.secondary_opts:
-                 parser.add_option(
--                    obj=self, opts=self.opts, dest=self.name, action=action, const=True
-+                    obj=self, opts=self.opts, dest=dest, action=action, const=True
-                 )
-                 parser.add_option(
-                     obj=self,
-                     opts=self.secondary_opts,
--                    dest=self.name,
-+                    dest=dest,
-                     action=action,
-                     const=False,
-                 )
-@@ -3204,7 +3216,7 @@ class Option(Parameter):
-                 parser.add_option(
-                     obj=self,
-                     opts=self.opts,
--                    dest=self.name,
-+                    dest=dest,
-                     action=action,
-                     const=self.flag_value,
-                 )
-@@ -3212,7 +3224,7 @@ class Option(Parameter):
-             parser.add_option(
-                 obj=self,
-                 opts=self.opts,
--                dest=self.name,
-+                dest=dest,
-                 action=action,
-                 nargs=self.nargs,
++        name = self.name
++        if name == "_opt_help":
++            name = "help"
+         return {
+-            "name": self.name,
++            "name": name,
+             "param_type_name": self.param_type_name,
+             "opts": self.opts,
+             "secondary_opts": self.secondary_opts,
+@@ -3176,6 +3179,9 @@ class Option(Parameter):
+                 ).format(name=name)
              )
-@@ -3654,7 +3666,7 @@ class Argument(Parameter):
-         return f"'{self.human_readable_name}'"
+ 
++        if name == "help" and not expose_value:
++            name = "_opt_help"
++
+         return name, opts, secondary_opts
  
      def add_to_parser(self, parser: _OptionParser, ctx: Context) -> None:
--        parser.add_argument(dest=self.name, nargs=self.nargs, obj=self)
-+        parser.add_argument(dest=self._get_parser_dest(), nargs=self.nargs, obj=self)
- 
- 
- def __getattr__(name: str) -> object:

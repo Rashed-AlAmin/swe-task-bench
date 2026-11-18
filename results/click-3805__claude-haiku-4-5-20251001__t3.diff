@@ -1,28 +1,25 @@
 diff --git a/src/click/_utils.py b/src/click/_utils.py
-index 05ee2e9..5c62fad 100644
+index 05ee2e9..47f7fb2 100644
 --- a/src/click/_utils.py
 +++ b/src/click/_utils.py
-@@ -3,6 +3,14 @@ from __future__ import annotations
- import enum
+@@ -4,6 +4,11 @@ import enum
  import typing as t
  
-+if t.TYPE_CHECKING:
-+    from typing import Any
-+
-+
-+def _restore_sentinel(cls: type[Sentinel], name: str) -> Sentinel:
-+    """Restore a Sentinel member during unpickling."""
-+    return cls[name]
-+
  
++def _get_sentinel_member(name: str) -> Sentinel:
++    """Reconstruct a Sentinel member by name during unpickling."""
++    return Sentinel[name]
++
++
  class Sentinel(enum.Enum):
      """Enum used to define sentinel values.
-@@ -18,6 +26,9 @@ class Sentinel(enum.Enum):
+ 
+@@ -18,6 +23,9 @@ class Sentinel(enum.Enum):
      def __repr__(self) -> str:
          return f"{self.__class__.__name__}.{self.name}"
  
-+    def __reduce_ex__(self, protocol: int) -> tuple[Any, tuple[Any, ...]]:
-+        return _restore_sentinel, (self.__class__, self.name)
++    def __reduce_ex__(self, protocol: int) -> tuple[t.Callable[..., Sentinel], tuple[str]]:
++        return (_get_sentinel_member, (self.name,))
 +
  
  UNSET: t.Literal[Sentinel.UNSET] = Sentinel.UNSET

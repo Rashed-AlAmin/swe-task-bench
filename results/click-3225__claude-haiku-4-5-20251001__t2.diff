@@ -1,79 +1,42 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 23d1dd5..15a0713 100644
+index 23d1dd5..1dc2428 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -3239,6 +3239,25 @@ class Option(Parameter):
+@@ -2820,12 +2820,18 @@ class Option(Parameter):
+                 self.default = False
  
-         return rv
+         # Support the special case of aligning the default value with the flag_value
+-        # for flags whose default is explicitly set to True. Note that as long as we
+-        # have this condition, there is no way a flag can have a default set to True,
+-        # and a flag_value set to something else. Refs:
++        # for flags whose default is explicitly set to True. However, we need to be
++        # careful with callable flag_values and UNPROCESSED type: if type is UNPROCESSED,
++        # we should not set self.default to the flag_value, since UNPROCESSED means the
++        # value should not be processed (including not being called as a factory). Instead,
++        # the consume_value method will handle the replacement. Refs:
+         # https://github.com/pallets/click/issues/3024#issuecomment-3146199461
+         # https://github.com/pallets/click/pull/3030/commits/06847da
+-        if self.default is True and self.flag_value is not UNSET:
++        if (
++            self.default is True
++            and self.flag_value is not UNSET
++            and not (callable(self.flag_value) and self.type is types.UNPROCESSED)
++        ):
+             self.default = self.flag_value
  
-+    def get_default(
-+        self, ctx: Context, call: bool = True
-+    ) -> t.Any | t.Callable[[], t.Any] | None:
-+        """Get the default for this option.
-+
-+        For flags with a flag_value, the flag_value should not be called
-+        even if it is callable, since it is intended as a constant value.
-+
-+        :meta private:
-+        """
-+        value = super().get_default(ctx, call=False)
-+
-+        # For flags, never call the flag_value even if it is callable.
-+        # The flag_value is a constant that should be used as-is.
-+        if call and callable(value) and not (self.is_flag and value is self.flag_value):
-+            value = value()
-+
-+        return value
-+
-     def consume_value(
-         self, ctx: Context, opts: cabc.Mapping[str, Parameter]
-     ) -> tuple[t.Any, ParameterSource]:
-diff --git a/tests/test_options.py b/tests/test_options.py
-index b162a96..abaeedb 100644
---- a/tests/test_options.py
-+++ b/tests/test_options.py
-@@ -2166,7 +2166,7 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
-             {"flag_value": Class1, "default": True},
-             {"flag_value": Class2},
-             [],
--            re.compile(r"'<test_options.Class1 object at 0x[0-9A-Fa-f]+>'"),
-+            "<class 'test_options.Class1'>",
-         ),
-         (
-             {"flag_value": Class1, "default": True},
-@@ -2188,7 +2188,7 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
-             {"flag_value": Class1, "type": UNPROCESSED, "default": True},
-             {"flag_value": Class2, "type": UNPROCESSED},
-             [],
--            re.compile(r"<test_options.Class1 object at 0x[0-9A-Fa-f]+>"),
-+            Class1,
-         ),
-         (
-             {"flag_value": Class1, "type": UNPROCESSED, "default": True},
-@@ -2202,14 +2202,13 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
-             ["--opt2"],
-             Class2,
-         ),
--        # Setting the default to a class, an instance of the class is returned instead
--        # of the class itself, because the default is allowed to be callable (and
--        # consummd). And this happens whatever the type is.
-+        # Setting the default to a class. If it's the same as flag_value, it's not
-+        # called. If it's different, the callable default is called.
-         (
-             {"flag_value": Class1, "default": Class1},
-             {"flag_value": Class2},
-             [],
--            re.compile(r"'<test_options.Class1 object at 0x[0-9A-Fa-f]+>'"),
-+            "<class 'test_options.Class1'>",
-         ),
-         (
-             {"flag_value": Class1, "default": Class2},
-@@ -2221,7 +2220,7 @@ def test_custom_type_flag_value_standalone_option(runner, opt_params, args, expe
-             {"flag_value": Class1, "type": UNPROCESSED, "default": Class1},
-             {"flag_value": Class2, "type": UNPROCESSED},
-             [],
--            re.compile(r"<test_options.Class1 object at 0x[0-9A-Fa-f]+>"),
-+            Class1,
-         ),
-         (
-             {"flag_value": Class1, "type": UNPROCESSED, "default": Class2},
+         # Set the default flag_value if it is not set.
+@@ -3265,13 +3271,11 @@ class Option(Parameter):
+                 value = self.flag_value
+                 source = ParameterSource.COMMANDLINE
+ 
+-        # A flag which is activated always returns the flag value, unless the value
+-        # comes from the explicitly sets default.
++        # A flag which is activated always returns the flag value.
+         elif (
+             self.is_flag
+             and value is True
+             and not self.is_bool_flag
+-            and source not in (ParameterSource.DEFAULT, ParameterSource.DEFAULT_MAP)
+         ):
+             value = self.flag_value
+ 

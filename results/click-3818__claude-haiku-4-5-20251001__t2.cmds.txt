@@ -1,0 +1,11 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t2 -type f -name "*.py" | grep -E "(click|__init__|core|exception)" | head -20
+grep -n "def main" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t2/src/click/core.py | head -5
+grep -n "def prompt" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t2/src/click/termui.py
+grep -n "class Abort" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t2/src/click/exceptions.py
+grep -r "KeyboardInterrupt\|Ctrl.*C\|Aborted" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t2/tests/*.py | head -20
+grep -A 15 '@pytest.mark.parametrize("exc", (EOFError, KeyboardInterrupt))' /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t2/tests/test_commands.py
+python -m pytest tests/test_commands.py::test_abort_exceptions_with_disabled_standalone_mode -v
+python3 -m pytest tests/test_commands.py::test_abort_exceptions_with_disabled_standalone_mode -v
+python3 -m pytest tests/test_commands.py -v
+python3 -m pytest tests/test_termui.py -v
+python3 -m pytest tests/ -x -q --tb=short 2>&1 | head -100

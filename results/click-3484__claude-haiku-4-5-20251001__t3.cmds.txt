@@ -1,0 +1,39 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3 -type f -name "*.py" | head -20
+cat > test_bug.py << 'EOF' ⏎ import click ⏎  ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         click.echo(f"{param.name} origin={ctx.get_parameter_source(param.name)}") ⏎         return value ⏎  ⏎ @click.command() ⏎ @click.option(
+python test_bug.py
+python3 test_bug.py
+python3 test_bug.py --config ./staging.toml
+cat > test_bug2.py << 'EOF' ⏎ import click ⏎  ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         return value ⏎  ⏎ @click.command() ⏎ @click.option("--config", type=ConfigPath(), default="/etc/deploy.toml") ⏎ def deploy(config): ⏎ 
+python3 -c "from click import ParameterSource; print([(e.name, e.value) for e in ParameterSource])"
+python3 test_bug2.py --config ./staging.toml
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests -name "*.py" -exec grep -l "get_parameter_source\|ParameterSource" {} \;
+grep -A 20 "get_parameter_source" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/test_context.py | head -50
+python3 test_bug.py
+python3 test_bug.py --config ./staging.toml
+cat > test_flag.py << 'EOF' ⏎ import click ⏎ import os ⏎  ⏎ def set_debug_callback(ctx, param, value): ⏎     # Only set env var if the user explicitly typed the flag ⏎     source = ctx.get_parameter_source(param.name) ⏎     if source == click.ParameterSource.COMMANDLINE: ⏎         click.echo(f"Flag 
+python3 test_flag.py
+python3 test_flag.py --debug
+python3 -m pytest tests/test_context.py -xvs
+python3 -m pytest tests/test_defaults.py -xvs
+python3 -m pytest tests/ -x --tb=short 2>&1 | head -100
+python3 -m pytest tests/ --ignore=tests/test_basic.py -x --tb=short -q 2>&1 | tail -20
+rm test_bug.py test_bug2.py test_flag.py
+cat > /tmp/test_comprehensive.py << 'EOF' ⏎ import click ⏎ import os ⏎  ⏎ # Test case 1: Custom param type with convert method ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         source = ctx.get_parameter_source(param.name) ⏎      
+cd /tmp && python3 test_comprehensive.py test1 --config /staging.toml
+cd /tmp && python3 test_comprehensive.py test2
+cd /tmp && python3 test_comprehensive.py test2 --debug
+cd /tmp && python3 test_comprehensive.py test2 --no-debug
+unset DEBUG && cd /tmp && python3 test_comprehensive.py test2 --no-debug
+cat > /tmp/test_flag_detailed.py << 'EOF' ⏎ import click ⏎ import os ⏎  ⏎ def set_debug_callback(ctx, param, value): ⏎     source = ctx.get_parameter_source(param.name) ⏎     click.echo(f"Callback called: value={value}, source={source}") ⏎     if source == click.ParameterSource.COMMANDLINE: ⏎       
+python3 /tmp/test_flag_detailed.py --debug
+python3 /tmp/test_flag_detailed.py --no-debug
+grep -r "feature.switch\|feature switch" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/ | head -5
+grep -A 30 "feature.switch" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/test_options.py | head -40
+python3 -m pytest /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/test_options.py -xvs -k "feature_switch or feature_group"
+grep "def test.*switch" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/test_options.py
+grep -B 10 "feature-switch group" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/test_options.py | grep "def test"
+python3 -m pytest /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/test_options.py::test_bool_flag_group_competition -xvs
+python3 -m pytest /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/test_options.py::test_flag_group_competition_non_boolean -xvs
+python3 -m pytest /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/test_options.py::test_bool_flag_group_competition_with_envvar -xvs
+python3 -m pytest /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/test_context.py /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t3/tests/test_defaults.py /home/rashed-al-amin/Desktop/swe-task-bench/work/click-
+rm -f /tmp/test_comprehensive.py /tmp/test_flag_detailed.py

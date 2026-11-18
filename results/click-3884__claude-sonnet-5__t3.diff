@@ -1,8 +1,8 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 9cf05a9..f7fcb35 100644
+index 9cf05a9..8ae9ed9 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -3270,8 +3270,14 @@ class Option(Parameter):
+@@ -3270,8 +3270,13 @@ class Option(Parameter):
  
      def get_error_hint(self, ctx: Context | None) -> str:
          result = super().get_error_hint(ctx)
@@ -13,25 +13,26 @@ index 9cf05a9..f7fcb35 100644
 +                envvars = (self.envvar,)
 +            else:
 +                envvars = tuple(self.envvar)
-+
-+            names = ", ".join(f"'{envvar}'" for envvar in envvars)
-+            result += f" (env var: {names})"
++            joined = ", ".join(f"'{envvar}'" for envvar in envvars)
++            result += f" (env var: {joined})"
          return result
  
      def _parse_decls(
-@@ -3449,9 +3455,13 @@ class Option(Parameter):
+@@ -3439,7 +3444,7 @@ class Option(Parameter):
+         if self.show_envvar:
+             envvar = self.envvar
  
-             if envvar is not None:
+-            if envvar is None:
++            if not envvar:
+                 if (
+                     self.allow_from_autoenv
+                     and ctx.auto_envvar_prefix is not None
+@@ -3447,7 +3452,7 @@ class Option(Parameter):
+                 ):
+                     envvar = f"{ctx.auto_envvar_prefix}_{self.name.upper()}"
+ 
+-            if envvar is not None:
++            if envvar:
                  if isinstance(envvar, str):
--                    extra["envvars"] = (envvar,)
-+                    if envvar:
-+                        extra["envvars"] = (envvar,)
+                     extra["envvars"] = (envvar,)
                  else:
--                    extra["envvars"] = tuple(str(d) for d in envvar)
-+                    envvars = tuple(str(d) for d in envvar)
-+
-+                    if envvars:
-+                        extra["envvars"] = envvars
- 
-         # Temporarily enable resilient parsing to avoid type casting
-         # failing for the default. Might be possible to extend this to

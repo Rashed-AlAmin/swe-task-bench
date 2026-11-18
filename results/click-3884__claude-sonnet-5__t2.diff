@@ -1,8 +1,8 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 9cf05a9..011e4ca 100644
+index 9cf05a9..ba78ad8 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -3270,8 +3270,13 @@ class Option(Parameter):
+@@ -3270,8 +3270,12 @@ class Option(Parameter):
  
      def get_error_hint(self, ctx: Context | None) -> str:
          result = super().get_error_hint(ctx)
@@ -10,15 +10,14 @@ index 9cf05a9..011e4ca 100644
 -            result += f" (env var: '{self.envvar}')"
 +        if self.show_envvar and self.envvar:
 +            if isinstance(self.envvar, str):
-+                envvars = (self.envvar,)
++                envvar = f"'{self.envvar}'"
 +            else:
-+                envvars = tuple(self.envvar)
-+            vars_str = ", ".join(f"'{var}'" for var in envvars)
-+            result += f" (env var: {vars_str})"
++                envvar = ", ".join(f"'{d}'" for d in self.envvar)
++            result += f" (env var: {envvar})"
          return result
  
      def _parse_decls(
-@@ -3439,7 +3444,7 @@ class Option(Parameter):
+@@ -3439,7 +3443,7 @@ class Option(Parameter):
          if self.show_envvar:
              envvar = self.envvar
  
@@ -27,7 +26,7 @@ index 9cf05a9..011e4ca 100644
                  if (
                      self.allow_from_autoenv
                      and ctx.auto_envvar_prefix is not None
-@@ -3447,7 +3452,7 @@ class Option(Parameter):
+@@ -3447,7 +3451,7 @@ class Option(Parameter):
                  ):
                      envvar = f"{ctx.auto_envvar_prefix}_{self.name.upper()}"
  

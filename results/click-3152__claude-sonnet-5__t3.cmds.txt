@@ -1,0 +1,6 @@
+git log --oneline -- src/click/core.py | head -30
+python -c " ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ @click.option('--compress', type=str, is_flag=False, flag_value='gzip', default='none') ⏎ def backup(compress): ⏎     click.echo(compress) ⏎  ⏎ runner = CliRunner() ⏎ for args in ([], ['--compress', 'zstd'], ['-
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ @click.option('--compress', type=str, is_flag=False, flag_value='gzip', default='none') ⏎ def backup(compress): ⏎     click.echo(compress) ⏎  ⏎ runner = CliRunner() ⏎ fo
+python3 -m pytest tests/test_options.py -q 2>&1 | tail -40
+python3 -m pytest tests/ -q 2>&1 | tail -20
+python3 -m pytest tests/ -q --ignore=tests/test_basic.py 2>&1 | tail -20

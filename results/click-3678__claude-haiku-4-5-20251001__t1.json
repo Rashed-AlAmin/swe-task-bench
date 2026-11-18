@@ -1,0 +1,22 @@
+{
+  "pr": 3678,
+  "model": "claude-haiku-4-5-20251001",
+  "trial": 1,
+  "title": "Fix parsing when a parameter is named `help`",
+  "elapsed_s": 271.1,
+  "agent_exit": 0,
+  "diff_lines": 28,
+  "shell_calls": 31,
+  "turns": 73,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": false,
+  "f2p_passed": 0,
+  "f2p_total": 10,
+  "p2p_broken": 0,
+  "p2p_total": 766,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [],
+  "void": null
+}

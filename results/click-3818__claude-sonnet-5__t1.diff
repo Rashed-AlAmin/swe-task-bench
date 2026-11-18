@@ -1,8 +1,8 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index de129ec..372fe64 100644
+index de129ec..64a8f8f 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -1548,49 +1548,61 @@ class Command:
+@@ -1548,47 +1548,58 @@ class Command:
  
          try:
              try:
@@ -90,16 +90,12 @@ index de129ec..372fe64 100644
 -        except Abort:
 +                echo(_("Aborted!"), file=sys.stderr)
 +                sys.exit(1)
-+        except KeyboardInterrupt as e:
-+            # A second interrupt can arrive while the first one is still
-+            # being turned into a clean "Aborted!" message (e.g. while
-+            # unwinding context cleanup), landing outside the `try` above.
-+            # Treat it the same way instead of letting it crash out as a
-+            # raw traceback.
++        except (EOFError, KeyboardInterrupt):
++            # A second interrupt can arrive while the first is already
++            # being handled above (e.g. during the cleanup of the ``with``
++            # block, or while printing the message for the first one). Make
++            # sure it still results in a clean "Aborted!" instead of an
++            # unhandled traceback.
              if not standalone_mode:
--                raise
-+                raise Abort() from e
-+            echo(file=sys.stderr)
+                 raise
              echo(_("Aborted!"), file=sys.stderr)
-             sys.exit(1)
- 

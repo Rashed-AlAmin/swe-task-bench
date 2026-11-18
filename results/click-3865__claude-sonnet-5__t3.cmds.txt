@@ -1,0 +1,7 @@
+cat > /tmp/reports.py << 'EOF' ⏎ import click ⏎  ⏎ @click.group() ⏎ def reports(): ⏎     pass ⏎  ⏎ @reports.command() ⏎ def compare(): ⏎     """Weigh apples vs. pears before the quarterly roll-up.""" ⏎  ⏎ @reports.command() ⏎ def ingest(): ⏎     """Load the feed. retries are automatic and logged."""
+PYTHONPATH=src python3 /tmp/reports.py --help
+python3 -c " ⏎ from click.utils import _make_default_short_help as f ⏎ print(repr(f('This is the first sentence. This is the second sentence.'))) ⏎ print(repr(f('This is a very long sentence that will definitely exceed the max length limit and should be truncated with ellipsis', 45))) ⏎ print(repr(f
+python3 -m pytest tests/ -k "short_help or help" -q 2>&1 | tail -60
+git stash && python3 -m pytest tests/test_utils/test_make_default_short_help.py -q 2>&1 | tail -20 && git stash pop
+python3 -m pytest tests/ -q 2>&1 | tail -15
+git diff

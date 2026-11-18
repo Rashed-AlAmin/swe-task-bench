@@ -1,0 +1,35 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t1 -type f -name "*.py" | grep -E "(choice|option)" | head -20
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t1 -type f -name "*.py" -path "*/src/*" | head -20
+python test_enum_issue.py --help
+python3 test_enum_issue.py --help
+grep -n "show_default\|default:" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t1/src/click/core.py | head -50
+python3 -c "import enum; class H(enum.Enum): MD5 = 1; print(str(H.MD5)); print(H.MD5.name)"
+python3 << 'EOF' ⏎ import enum ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = 1 ⏎     SHA1 = 2 ⏎  ⏎ class IntHashType(enum.IntEnum): ⏎     LOW = 1 ⏎     HIGH = 2 ⏎  ⏎ # Regular Enum ⏎ e = HashType.SHA1 ⏎ print(f"Regular Enum str(): {str(e)}") ⏎ print(f"Regular Enum .name: {e.name}") ⏎ print(f"Regular E
+grep -n "^import\|^from" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t1/src/click/core.py | head -40
+python3 test_enum_issue.py --help
+python3 test_intenum_issue.py --help
+python3 test_enum_issue.py
+python3 test_enum_issue.py --checksum SHA1
+python3 test_enum_issue.py --checksum HashType.SHA1 2>&1
+python3 -c " ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ choice_type = click.Choice(HashType) ⏎  ⏎ # Test the shell_complete functionality ⏎ class FakeParam: ⏎     param_type_name = 'option' ⏎     show_choices = True ⏎  ⏎ class F
+python3 -c " ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ choice_type = click.Choice(HashType) ⏎  ⏎ # Test the shell_complete functionality ⏎ class FakeParam: ⏎     param_type_name = 'option' ⏎     show_choices = True ⏎  ⏎ class F
+python3 -m pytest tests/test_options.py -xvs
+python3 -m pytest tests/test_types.py -xvs
+grep -r "enum\|Enum" tests/ --include="*.py" | head -20
+python3 -m pytest tests/test_basic.py::test_choice_argument_enum -xvs
+python3 -m pytest tests/test_basic.py -k "enum" -xvs 2>&1 | head -100
+python3 -m pytest tests/ -x --ignore=tests/test_basic.py -q 2>&1 | tail -50
+python3 -m pytest tests/test_shell_completion.py::test_choice_case_sensitive -xvs
+python3 -c " ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ choice_type = click.Choice(HashType) ⏎  ⏎ # Test the shell_complete functionality ⏎ class FakeParam: ⏎     param_type_name = 'option' ⏎     show_choices = True ⏎  ⏎ class F
+python3 -m pytest tests/test_shell_completion.py -xvs 2>&1 | tail -100
+python3 -m pytest tests/ --ignore=tests/test_basic.py -q
+python3 test_enum_issue.py --help
+python3 test_intenum_issue.py --help
+python3 test_enum_issue.py
+python3 test_enum_issue.py --checksum MD5
+python3 test_intenum_issue.py --priority HIGH
+rm -f /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t1/test_enum_issue.py /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3004__claude-haiku-4-5-20251001__t1/test_intenum_issue.py
+python3 << 'EOF' ⏎ import enum ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ class Priority(enum.IntEnum): ⏎     LOW = 1 ⏎     HIGH = 2 ⏎  ⏎ @click.command() ⏎ @click.option("--checksum", type=click.Choice(H
+python3 -m pytest tests/test_options.py tests/test_types.py tests/test_shell_completion.py -q
+python3 << 'EOF' ⏎ import enum ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ @click.command() ⏎ @click.option( ⏎     "--checksum", ⏎     type=click.Choice(HashType), ⏎     default=HashType.SHA1, ⏎     show_d
+python3 -m pytest tests/ --ignore=tests/test_basic.py -q --tb=short

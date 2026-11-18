@@ -1,0 +1,12 @@
+cat > /tmp/export.py << 'EOF' ⏎ import click ⏎  ⏎ class JsonWriter: ⏎     """Takes a path, writes rows to it.""" ⏎  ⏎ @click.command() ⏎ @click.option("--json", "writer", flag_value=JsonWriter, ⏎               type=click.UNPROCESSED, default=True, show_default=True) ⏎ def export(writer): ⏎     click
+PYTHONPATH=src python3 - << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ class JsonWriter: ⏎     pass ⏎  ⏎ @click.command() ⏎ @click.option("--json", "writer", flag_value=JsonWriter, ⏎               type=click.UNPROCESSED, default=True, show_default=True) ⏎ def export(writer): ⏎  
+PYTHONPATH=src python3 - << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ class JsonWriter: ⏎     pass ⏎  ⏎ @click.command() ⏎ @click.option("--json", "writer", flag_value=JsonWriter, ⏎               type=click.UNPROCESSED, default=JsonWriter, show_default=True) ⏎ def export(writer
+PYTHONPATH=src python3 /tmp/export.py --json && PYTHONPATH=src python3 /tmp/export.py && PYTHONPATH=src python3 /tmp/export.py --help
+PYTHONPATH=src python3 - << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ class CsvWriter: ⏎     def __init__(self, delimiter): ⏎         self.delimiter = delimiter ⏎  ⏎ class JsonWriter: ⏎     pass ⏎  ⏎ @click.command() ⏎ @click.option("--json", "writer", flag_value=JsonWriter, ty
+python3 -m pytest tests/ -q -k "flag or default" 2>&1 | tail -50
+python3 -m pytest tests/ -q -p no:cacheprovider -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -60
+grep -n "test_custom_type_flag_value_dual_options" -A 5 tests/test_options.py | head -20
+grep -n "Class1\|Class2\|def test_custom_type_flag_value_dual_options\|@pytest.mark.parametrize" tests/test_options.py | sed -n '1,80p'
+python3 -m pytest tests/ -q -p no:cacheprovider -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -30
+python3 -m pytest tests/test_options.py -q -k "test_custom_type_flag_value_dual_options" -p no:cacheprovider -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -30
+PYTHONPATH=src python3 /tmp/export.py --json; PYTHONPATH=src python3 /tmp/export.py; PYTHONPATH=src python3 /tmp/export.py --help

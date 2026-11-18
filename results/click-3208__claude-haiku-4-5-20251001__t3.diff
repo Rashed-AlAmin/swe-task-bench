@@ -1,8 +1,8 @@
 diff --git a/src/click/exceptions.py b/src/click/exceptions.py
-index 4d782ee..20afd56 100644
+index 4d782ee..061e3e4 100644
 --- a/src/click/exceptions.py
 +++ b/src/click/exceptions.py
-@@ -78,10 +78,16 @@ class UsageError(ClickException):
+@@ -78,10 +78,14 @@ class UsageError(ClickException):
              self.ctx is not None
              and self.ctx.command.get_help_option(self.ctx) is not None
          ):
@@ -11,15 +11,13 @@ index 4d782ee..20afd56 100644
 -            )
 -            hint = f"{hint}\n"
 +            help_option_names = self.ctx.command.get_help_option_names(self.ctx)
-+            # Preserve the order from ctx.help_option_names by finding the first
-+            # available help option in the original order
-+            for option_name in self.ctx.help_option_names:
-+                if option_name in help_option_names:
-+                    hint = _("Try '{command} {option}' for help.").format(
-+                        command=self.ctx.command_path, option=option_name
-+                    )
-+                    hint = f"{hint}\n"
-+                    break
++            if help_option_names:
++                # Prefer the longest option name for clarity (usually --help over -h)
++                help_option = max(help_option_names, key=len)
++                hint = _("Try '{command} {option}' for help.").format(
++                    command=self.ctx.command_path, option=help_option
++                )
++                hint = f"{hint}\n"
          if self.ctx is not None:
              color = self.ctx.color
              echo(f"{self.ctx.get_usage()}\n{hint}", file=file, color=color)

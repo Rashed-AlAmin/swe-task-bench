@@ -1,0 +1,4 @@
+cat > /tmp/deployctl.py << 'EOF' ⏎ import click ⏎  ⏎ @click.group(context_settings={"help_option_names": ["-h", "--help"]}) ⏎ def deployctl(): ⏎     pass ⏎  ⏎ @deployctl.command() ⏎ @click.option("-h", "--host", default="localhost") ⏎ @click.argument("service") ⏎ def restart(host, service): ⏎     cl
+cat > /tmp/plain.py << 'EOF' ⏎ import click ⏎  ⏎ @click.group(context_settings={"help_option_names": ["-h", "--help"]}) ⏎ def cli(): ⏎     pass ⏎  ⏎ @cli.command() ⏎ @click.argument("name") ⏎ def greet(name): ⏎     click.echo(f"hello {name}") ⏎  ⏎ if __name__ == "__main__": ⏎     cli() ⏎ EOF ⏎ PYTHO
+python3 -m pytest tests/ -q 2>&1 | tail -30
+python3 -m pytest tests/ -q -p no:cacheprovider -W "ignore::DeprecationWarning" 2>&1 | tail -40

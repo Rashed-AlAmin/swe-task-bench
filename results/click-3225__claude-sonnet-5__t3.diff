@@ -1,33 +1,42 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 23d1dd5..e7755d8 100644
+index 23d1dd5..5fb6e86 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -2281,12 +2281,19 @@ class Parameter:
-         name = self.name
-         value = ctx.lookup_default(name, call=False) if name is not None else None
- 
-+        from_default = False
-+
-         if value is None and not (
-             ctx.default_map is not None and name is not None and name in ctx.default_map
-         ):
-             value = self.default
-+            from_default = True
- 
--        if call and callable(value):
-+        if (
-+            call
-+            and callable(value)
-+            and not (from_default and getattr(self, "_flag_value_is_default", False))
-+        ):
-             value = value()
- 
-         return value
-@@ -2827,6 +2834,7 @@ class Option(Parameter):
+@@ -2825,8 +2825,14 @@ class Option(Parameter):
+         # and a flag_value set to something else. Refs:
+         # https://github.com/pallets/click/issues/3024#issuecomment-3146199461
          # https://github.com/pallets/click/pull/3030/commits/06847da
++        #
++        # This alignment means the default *is* the flag_value, verbatim, so unlike a
++        # user-provided default it must not be treated as a callable factory to call
++        # for its value, even if flag_value happens to be callable (e.g. a class).
++        self._default_is_flag_value_alias = False
          if self.default is True and self.flag_value is not UNSET:
              self.default = self.flag_value
-+            self._flag_value_is_default = True
++            self._default_is_flag_value_alias = True
  
          # Set the default flag_value if it is not set.
          if self.flag_value is UNSET:
+@@ -2896,6 +2902,22 @@ class Option(Parameter):
+             result += f" (env var: '{self.envvar}')"
+         return result
+ 
++    def get_default(
++        self, ctx: Context, call: bool = True
++    ) -> t.Any | t.Callable[[], t.Any] | None:
++        # When the default was automatically aligned to flag_value (because
++        # the user passed default=True as a shorthand), the default is the
++        # flag_value verbatim, exactly as if the flag had been activated on
++        # the command line. It must not be treated as a callable factory,
++        # even if flag_value happens to be callable itself (e.g. a class
++        # used as a sentinel value). A default explicitly provided by the
++        # user, even if it happens to equal flag_value, is unaffected and
++        # is still called as usual.
++        if self._default_is_flag_value_alias:
++            return self.flag_value
++
++        return super().get_default(ctx, call=call)
++
+     def _parse_decls(
+         self, decls: cabc.Sequence[str], expose_value: bool
+     ) -> tuple[str | None, list[str], list[str]]:

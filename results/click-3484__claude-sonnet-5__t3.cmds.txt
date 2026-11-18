@@ -1,0 +1,5 @@
+git log --oneline -- src/click/core.py | head -20
+cat > /tmp/deploy.py << 'EOF' ⏎ import click ⏎  ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         click.echo(f"{param.name} origin={ctx.get_parameter_source(param.name)}") ⏎         return value ⏎  ⏎ @click.command() ⏎ @click.opti
+python3 -m pytest tests/ -q 2>&1 | tail -40
+python3 -m pytest tests/ -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -60
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ def debug_callback(ctx, param, value): ⏎     source = ctx.get_parameter_source(param.name) ⏎     click.echo(f'debug callback source={source}') ⏎     return value ⏎  ⏎ @click.command() ⏎ @c

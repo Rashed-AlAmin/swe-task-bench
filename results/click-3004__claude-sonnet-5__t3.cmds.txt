@@ -1,0 +1,4 @@
+cat > /tmp/ingest.py << 'EOF' ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ class IntHashType(enum.IntEnum): ⏎     LOW = 1 ⏎     HIGH = 2 ⏎  ⏎ @click.command() ⏎ @click.option( ⏎     "--checksum", ⏎     type=click.Choice(HashType),
+PYTHONPATH=src python3 /tmp/ingest.py --checksum SHA1 --level HIGH && PYTHONPATH=src python3 -m pytest tests/ -q -k "default or choice" 2>&1 | tail -40
+PYTHONPATH=src python3 -m pytest tests/ -q -k "default or choice" --ignore=tests/test_basic.py 2>&1 | tail -60
+PYTHONPATH=src python3 -m pytest tests/ -q --ignore=tests/test_basic.py 2>&1 | tail -20

@@ -1,16 +1,15 @@
 diff --git a/src/click/formatting.py b/src/click/formatting.py
-index d9075ca..c362171 100644
+index d9075ca..d71636b 100644
 --- a/src/click/formatting.py
 +++ b/src/click/formatting.py
-@@ -164,7 +164,12 @@ class HelpFormatter:
+@@ -164,7 +164,11 @@ class HelpFormatter:
          usage_prefix = f"{prefix:>{self.current_indent}}{prog} "
          text_width = self.width - self.current_indent
  
 -        if text_width >= (term_len(usage_prefix) + 20):
 +        if not args:
-+            # No arguments to wrap, so just write the prefix as-is without
-+            # going through wrap_text, which would drop it since there is
-+            # no text to wrap.
++            # ``wrap_text`` on an empty string produces no lines at all,
++            # which would drop the prefix and leave a blank usage line.
 +            self.write(usage_prefix.rstrip())
 +        elif text_width >= (term_len(usage_prefix) + 20):
              # The arguments will fit to the right of the prefix.

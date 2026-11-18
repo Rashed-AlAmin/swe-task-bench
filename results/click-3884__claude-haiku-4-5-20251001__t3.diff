@@ -1,5 +1,5 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 9cf05a9..942709f 100644
+index 9cf05a9..911849b 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
 @@ -3271,7 +3271,14 @@ class Option(Parameter):
@@ -11,10 +11,10 @@ index 9cf05a9..942709f 100644
 +                if self.envvar:
 +                    result += f" (env var: '{self.envvar}')"
 +            else:
-+                envvars_list = [str(d) for d in self.envvar if d]
++                envvars_list = [x for x in self.envvar if x]
 +                if envvars_list:
-+                    envvar_str = ", ".join(envvars_list)
-+                    result += f" (env var: '{envvar_str}')"
++                    envvar_str = ", ".join(f"'{x}'" for x in envvars_list)
++                    result += f" (env var: {envvar_str})"
          return result
  
      def _parse_decls(

@@ -1,27 +1,35 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 445460b..027eed7 100644
+index 445460b..d3ac3eb 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -2871,7 +2871,12 @@ class Option(Parameter):
+@@ -2867,11 +2867,20 @@ class Option(Parameter):
+         elif ctx.show_default is not None:
+             show_default = ctx.show_default
+ 
++        def _format_default(value: t.Any) -> str:
++            # For Choice types, show the same normalized value that is
++            # accepted on the command line (e.g. an enum member's name)
++            # rather than its raw ``str()``, which may not be a valid choice.
++            if isinstance(self.type, types.Choice) and value in self.type.choices:
++                return self.type.normalize_choice(value, ctx)
++
++            return str(value)
++
+         if show_default_is_str or (show_default and (default_value is not None)):
              if show_default_is_str:
                  default_string = f"({self.show_default})"
              elif isinstance(default_value, (list, tuple)):
 -                default_string = ", ".join(str(d) for d in default_value)
-+                default_string = ", ".join(
-+                    self.type.normalize_choice(d, ctx)
-+                    if isinstance(self.type, types.Choice)
-+                    else str(d)
-+                    for d in default_value
-+                )
++                default_string = ", ".join(_format_default(d) for d in default_value)
              elif inspect.isfunction(default_value):
                  default_string = _("(dynamic)")
              elif self.is_bool_flag and self.secondary_opts:
-@@ -2884,6 +2889,8 @@ class Option(Parameter):
-                 default_string = ""
+@@ -2885,7 +2894,7 @@ class Option(Parameter):
              elif default_value == "":
                  default_string = '""'
-+            elif isinstance(self.type, types.Choice):
-+                default_string = self.type.normalize_choice(default_value, ctx)
              else:
-                 default_string = str(default_value)
+-                default_string = str(default_value)
++                default_string = _format_default(default_value)
  
+             if default_string:
+                 extra["default"] = default_string

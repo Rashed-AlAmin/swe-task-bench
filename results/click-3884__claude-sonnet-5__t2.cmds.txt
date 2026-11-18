@@ -1,0 +1,4 @@
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ @click.option('--units', envvar=['WEATHER_UNITS', 'UNITS'], show_envvar=True, required=True) ⏎ def report(units): ⏎     click.echo(f'reporting in {units}') ⏎  ⏎ runner =
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ @click.option('--units', envvar='', show_envvar=True) ⏎ @click.option('--mode', envvar=[], show_envvar=True) ⏎ @click.option('--other', show_envvar=True) ⏎ def report(un
+python3 -m pytest tests/ -k "envvar or env_var" -q 2>&1 | tail -40
+python3 -m pytest tests/ -q 2>&1 | tail -20

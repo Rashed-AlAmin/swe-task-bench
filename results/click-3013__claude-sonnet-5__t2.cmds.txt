@@ -1,0 +1,4 @@
+grep -n -i "fish\|COMP_CWORD\|COMP_WORDS" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3013__claude-sonnet-5__t2/tests/test_shell_completion.py
+python -m pytest tests/test_shell_completion.py -k fish -q 2>&1 | tail -30
+python3 -m pytest tests/test_shell_completion.py -q 2>&1 | tail -40
+python3 - <<'EOF' ⏎ import os, sys ⏎ sys.path.insert(0, "src") ⏎ import click ⏎  ⏎ DATASETS = ["Sales Q1", "Sales Q2", "backfill"] ⏎  ⏎ def complete_dataset(ctx, param, value): ⏎     return [d for d in DATASETS if d.startswith(value)] ⏎  ⏎ @click.command() ⏎ @click.option("--dataset", shell_complete

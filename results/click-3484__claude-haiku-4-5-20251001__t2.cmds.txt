@@ -1,0 +1,47 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2 -type f -name "*.py" | head -20
+python test_issue.py
+python3 test_issue.py
+python3 test_issue.py --config ./staging.toml
+grep -n "get_parameter_source" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/src/click/core.py
+grep -n "_parameter_source" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/src/click/core.py
+grep -n "def process_value" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/src/click/core.py
+grep -n "def type_cast_value" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/src/click/core.py
+grep -n "def consume_value" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/src/click/core.py
+grep -n "class ParameterSource" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/src/click/core.py
+python3 test_issue.py
+python3 test_issue.py --config ./staging.toml
+python3 test_issue_enum.py
+python3 test_issue_enum.py --config ./staging.toml
+python3 test_eager_callback.py
+python3 test_eager_callback.py --debug
+python3 test_eager_callback.py --no-debug
+python3 -m pytest tests/ -xvs 2>&1 | head -100
+grep -r "get_parameter_source\|ParameterSource" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/tests/ | head -20
+python3 -m pytest tests/test_context.py -xvs 2>&1 | head -150
+python3 -m pytest tests/test_defaults.py -xvs 2>&1 | head -150
+python3 -m pytest tests/test_commands.py -x 2>&1 | tail -20
+python3 -m pytest tests/test_options.py -x 2>&1 | tail -20
+python3 -m pytest tests/test_types.py -x 2>&1 | tail -20
+python3 test_argument_source.py hello
+grep -n "class Argument" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/src/click/core.py
+grep -A 20 "class Argument" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/src/click/core.py | grep "def " | head -5
+grep -n "class Option" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/src/click/core.py
+TEST_ENV="hello" python3 test_env_source.py
+python3 test_env_source.py
+python3 test_env_source_with_default.py
+TEST_ENV="env_value" python3 test_env_source_with_default.py
+python3 test_default_map_source.py
+grep -n "feature-switch" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/tests/*.py
+python3 -m pytest tests/test_options.py::test_bool_flag_group_competition -xvs 2>&1 | head -50
+python3 -m pytest tests/test_options.py::test_bool_flag_group_competition_with_envvar -xvs 2>&1 | head -30
+python3 -m pytest tests/ -k "parameter_source or ParameterSource or get_parameter_source" -xvs 2>&1 | tail -50
+python3 -m pytest tests/test_context.py tests/test_defaults.py -k "parameter_source or ParameterSource or get_parameter_source" -xvs 2>&1 | tail -50
+grep -A 20 "def test_default_map_source" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/tests/test_defaults.py | head -30
+grep -r "def convert" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/tests/ | head -10
+grep -B 5 -A 10 "def convert.*ctx" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/tests/test_options.py | head -30
+python3 test_issue_enum.py
+python3 test_eager_callback.py
+python3 test_eager_callback.py --debug
+rm /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3484__claude-haiku-4-5-20251001__t2/test_*.py
+python3 -m pytest tests/test_context.py tests/test_defaults.py tests/test_commands.py tests/test_options.py tests/test_types.py -x 2>&1 | tail -30
+git diff src/click/core.py

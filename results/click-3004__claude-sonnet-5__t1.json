@@ -1,0 +1,22 @@
+{
+  "pr": 3004,
+  "model": "claude-sonnet-5",
+  "trial": 1,
+  "title": "Fix rendering of Enum choices' default",
+  "elapsed_s": 69.9,
+  "agent_exit": 0,
+  "diff_lines": 32,
+  "shell_calls": 3,
+  "turns": 15,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": true,
+  "f2p_passed": 5,
+  "f2p_total": 5,
+  "p2p_broken": 0,
+  "p2p_total": 295,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [],
+  "void": null
+}

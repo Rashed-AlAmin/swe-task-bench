@@ -1,0 +1,4 @@
+python -c " ⏎ import pickle, copy ⏎ import click ⏎  ⏎ opt = click.Option(['--name']) ⏎ r = pickle.loads(pickle.dumps(opt)) ⏎ print('pickle:', r.name, r.default) ⏎  ⏎ print('copy:', copy.copy(opt).name) ⏎ print('deepcopy:', copy.deepcopy(opt).name) ⏎  ⏎ @click.command() ⏎ @click.option('--name') ⏎ de
+python3 -c " ⏎ import pickle, copy ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ opt = click.Option(['--name']) ⏎ r = pickle.loads(pickle.dumps(opt)) ⏎ print('pickle:', r.name, r.default) ⏎  ⏎ print('copy:', copy.copy(opt).name) ⏎ print('deepcopy:', copy.deepcopy(opt).name) ⏎  ⏎ @clic
+python3 -c " ⏎ import pickle, copy, sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ opt = click.Option(['--name']) ⏎ r = pickle.loads(pickle.dumps(opt)) ⏎ print('pickle:', r.name, r.default) ⏎ print('copy:', copy.copy(opt).name) ⏎ print('deepcopy:', copy.deepcopy(opt).name) ⏎  ⏎ cmd = click.Comm
+python3 -m pytest -q 2>&1 | tail -30

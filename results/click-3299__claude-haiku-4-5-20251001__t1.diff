@@ -1,5 +1,5 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index f0a624b..c42fd95 100644
+index f0a624b..a52e014 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
 @@ -3092,7 +3092,7 @@ class Option(Parameter):
@@ -11,12 +11,23 @@ index f0a624b..c42fd95 100644
          ):
              if show_default_is_str:
                  default_string = f"({self.show_default})"
-@@ -3110,7 +3110,7 @@ class Option(Parameter):
+@@ -3110,10 +3110,16 @@ class Option(Parameter):
                  )[1]
              elif self.is_bool_flag and not self.secondary_opts and not default_value:
                  default_string = ""
 -            elif default_value == "":
-+            elif isinstance(default_value, str) and default_value == "":
-                 default_string = '""'
+-                default_string = '""'
              else:
-                 default_string = str(default_value)
+-                default_string = str(default_value)
++                try:
++                    is_empty_string = default_value == ""
++                except Exception:
++                    is_empty_string = False
++
++                if is_empty_string:
++                    default_string = '""'
++                else:
++                    default_string = str(default_value)
+ 
+             if default_string:
+                 extra["default"] = default_string

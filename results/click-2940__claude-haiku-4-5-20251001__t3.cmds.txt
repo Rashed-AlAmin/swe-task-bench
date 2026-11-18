@@ -1,0 +1,22 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-2940__claude-haiku-4-5-20251001__t3 -type f -name "*.py" | head -20
+python test_reproduce.py
+python3 test_reproduce.py
+python3 test_debug.py 2>&1
+python3 test_debug2.py 2>&1 | head -100
+python3 test_debug2.py
+python3 test_debug3.py
+python3 test_reproduce.py
+python3 test_prompt.py
+python3 -m pytest tests/ -xvs 2>&1 | head -200
+python3 -m pytest tests/ -k "test_" --co 2>&1 | head -50
+python3 -m pytest tests/test_arguments.py -xvs 2>&1 | head -100
+find tests -name "*.py" -exec grep -l "File\|stdin\|prompt" {} \;
+python3 -m pytest tests/test_testing.py -xvs
+python3 -m pytest tests/test_termui.py -xvs 2>&1 | head -150
+python3 -m pytest tests/test_termui.py -x 2>&1 | tail -20
+python3 -m pytest tests/test_types.py -x 2>&1 | tail -20
+python3 -m pytest tests/test_options.py tests/test_commands.py -x 2>&1 | tail -20
+python3 test_stdin_file.py
+python3 -m pytest test_stdin_file.py -xvs
+rm /home/rashed-al-amin/Desktop/swe-task-bench/work/click-2940__claude-haiku-4-5-20251001__t3/test_*.py
+python3 -m pytest tests/test_testing.py tests/test_arguments.py tests/test_types.py tests/test_commands.py -x 2>&1 | tail -30

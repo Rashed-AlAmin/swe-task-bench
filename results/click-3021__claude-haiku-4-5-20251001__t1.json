@@ -1,0 +1,22 @@
+{
+  "pr": 3021,
+  "model": "claude-haiku-4-5-20251001",
+  "trial": 1,
+  "title": "Fix rendering when `prompt_suffix` is empty",
+  "elapsed_s": 123.3,
+  "agent_exit": 0,
+  "diff_lines": 36,
+  "shell_calls": 19,
+  "turns": 35,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": false,
+  "f2p_passed": 0,
+  "f2p_total": 1,
+  "p2p_broken": 0,
+  "p2p_total": 142,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [],
+  "void": null
+}

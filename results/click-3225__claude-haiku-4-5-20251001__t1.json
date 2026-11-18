@@ -1,0 +1,22 @@
+{
+  "pr": 3225,
+  "model": "claude-haiku-4-5-20251001",
+  "trial": 1,
+  "title": "Fix callable ``flag_value`` being instantiated when used as a default",
+  "elapsed_s": 303.4,
+  "agent_exit": 0,
+  "diff_lines": 49,
+  "shell_calls": 43,
+  "turns": 68,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": false,
+  "f2p_passed": 5,
+  "f2p_total": 7,
+  "p2p_broken": 0,
+  "p2p_total": 577,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [],
+  "void": null
+}

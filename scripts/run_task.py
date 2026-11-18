@@ -86,12 +86,19 @@ def main():
     # the library that already contains the fix, so every shell command it ran
     # is recorded and screened; a flagged run is reported, never silently kept.
     suspect, ncalls, cmdlog = [], 0, []
-    turns, stop_reason = None, None
+    turns, stop_reason, void = None, None, None
     for line in r.stdout.splitlines():
         try: d = json.loads(line)
         except Exception: continue
         if d.get("type") == "result":
             turns, stop_reason = d.get("num_turns"), d.get("subtype")
+            # A run killed by the API - a 429 session limit, a transport error -
+            # still reports subtype "success", so it would be filed as an attempt
+            # the model failed. It never got one. is_error plus an api_error_status
+            # or terminal_reason marks the record void so scoring can drop it.
+            if d.get("is_error") and (d.get("api_error_status") or
+                                      d.get("terminal_reason") == "api_error"):
+                void = f'api_error {d.get("api_error_status")}: {str(d.get("result"))[:120]}'
         if d.get("type") != "assistant": continue
         for c in d.get("message", {}).get("content", []):
             if c.get("type") != "tool_use": continue
@@ -113,7 +120,7 @@ def main():
     rec = {"pr": int(pr), "model": model, "trial": int(trial), "title": task["title"], "elapsed_s": elapsed,
            "agent_exit": r.returncode, "diff_lines": len(diff.splitlines()),
            "shell_calls": ncalls, "turns": turns, "stop_reason": stop_reason,
-           "truncated": stop_reason == "error_max_turns",
+           "truncated": stop_reason == "error_max_turns", "void": void,
            "contamination_flags": suspect, **verdict}
     json.dump(rec, open(f"{ROOT}/results/{slug}.json","w"), indent=2)
     open(f"{ROOT}/results/{slug}.diff","w").write(diff)

@@ -1,0 +1,4 @@
+python -m pytest tests/ -q 2>&1 | tail -30
+python3 -m pytest tests/ -q 2>&1 | tail -30
+cd /tmp && cat > repro.py << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎ import click.core as core ⏎  ⏎ # Simulate a second KeyboardInterrupt arriving while handling the first one, ⏎ # by making the stderr echo() call itself raise KeyboardInterrupt once. ⏎  ⏎ orig_echo = core.echo ⏎
+rm -f /tmp/repro.py

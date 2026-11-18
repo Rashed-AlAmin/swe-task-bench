@@ -1,16 +1,28 @@
+diff --git a/src/click/core.py b/src/click/core.py
+index 4e011f0..4eb0f90 100644
+--- a/src/click/core.py
++++ b/src/click/core.py
+@@ -1078,7 +1078,10 @@ class Command:
+         for param in self.params:
+             all_names.difference_update(param.opts)
+             all_names.difference_update(param.secondary_opts)
+-        return list(all_names)
++        # Prefer long names (e.g. ``--help``) over short ones (e.g. ``-h``)
++        # so that anything built from this list, like the "Try '... --help'
++        # for help." hint, shows the more descriptive option first.
++        return sorted(all_names, key=lambda name: not name.startswith("--"))
+ 
+     def get_help_option(self, ctx: Context) -> Option | None:
+         """Returns the help option object.
 diff --git a/src/click/exceptions.py b/src/click/exceptions.py
-index 4d782ee..2f8035d 100644
+index 4d782ee..0673ae5 100644
 --- a/src/click/exceptions.py
 +++ b/src/click/exceptions.py
-@@ -78,8 +78,13 @@ class UsageError(ClickException):
+@@ -78,8 +78,9 @@ class UsageError(ClickException):
              self.ctx is not None
              and self.ctx.command.get_help_option(self.ctx) is not None
          ):
-+            help_option_names = self.ctx.command.get_help_option_names(self.ctx)
-+            option = next(
-+                (name for name in help_option_names if name.startswith("--")),
-+                help_option_names[0],
-+            )
++            option = self.ctx.command.get_help_option_names(self.ctx)[0]
              hint = _("Try '{command} {option}' for help.").format(
 -                command=self.ctx.command_path, option=self.ctx.help_option_names[0]
 +                command=self.ctx.command_path, option=option

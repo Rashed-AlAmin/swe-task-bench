@@ -1,5 +1,5 @@
 diff --git a/src/click/testing.py b/src/click/testing.py
-index 3d3cb17..3057a10 100644
+index 3d3cb17..f6f60b8 100644
 --- a/src/click/testing.py
 +++ b/src/click/testing.py
 @@ -127,13 +127,6 @@ class _NamedTextIOWrapper(io.TextIOWrapper):
@@ -16,3 +16,27 @@ index 3d3cb17..3057a10 100644
  
  def make_input_stream(
      input: str | bytes | t.IO[t.Any] | None, charset: str
+@@ -359,7 +352,10 @@ class CliRunner:
+         @_pause_echo(echo_input)  # type: ignore
+         def visible_input(prompt: str | None = None) -> str:
+             sys.stdout.write(prompt or "")
+-            val = next(text_input).rstrip("\r\n")
++            try:
++                val = next(text_input).rstrip("\r\n")
++            except StopIteration as e:
++                raise EOFError() from e
+             sys.stdout.write(f"{val}\n")
+             sys.stdout.flush()
+             return val
+@@ -368,7 +364,10 @@ class CliRunner:
+         def hidden_input(prompt: str | None = None) -> str:
+             sys.stdout.write(f"{prompt or ''}\n")
+             sys.stdout.flush()
+-            return next(text_input).rstrip("\r\n")
++            try:
++                return next(text_input).rstrip("\r\n")
++            except StopIteration as e:
++                raise EOFError() from e
+ 
+         @_pause_echo(echo_input)  # type: ignore
+         def _getchar(echo: bool) -> str:

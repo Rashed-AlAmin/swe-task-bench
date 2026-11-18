@@ -1,0 +1,3 @@
+cat <<'EOF' > /tmp/ingest.py ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ class Priority(enum.IntEnum): ⏎     LOW = 1 ⏎     HIGH = 2 ⏎  ⏎ @click.command() ⏎ @click.option( ⏎     "--checksum", ⏎     type=click.Choice(HashType), ⏎  
+python3 -m pytest tests/ -q 2>&1 | tail -40
+python3 -m pytest tests/ -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -60

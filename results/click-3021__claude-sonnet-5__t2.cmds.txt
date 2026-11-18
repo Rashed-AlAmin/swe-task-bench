@@ -1,0 +1,6 @@
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ import io ⏎ from unittest import mock ⏎  ⏎ # simulate prompt with empty suffix ⏎ with mock.patch('click.termui.visible_prompt_func', return_value='status'): ⏎     import click.termui as termui ⏎     out = io.StringIO() ⏎     with
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ from click.testing import CliRunner ⏎ import click ⏎  ⏎ @click.command() ⏎ def shell(): ⏎     line = click.prompt('admin>', prompt_suffix='') ⏎     click.echo(f'ran {line}') ⏎  ⏎ runner = CliRunner() ⏎ result = runner.invoke(shell, input='statu
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ from click.testing import CliRunner ⏎ import click ⏎  ⏎ @click.command() ⏎ def shell(): ⏎     v = click.confirm('Wipe cache?', prompt_suffix='') ⏎     click.echo(f'got {v}') ⏎  ⏎ @click.command() ⏎ def normal(): ⏎     line = click.prompt('Name'
+python3 -m pytest tests/test_termui.py -q 2>&1 | tail -40
+python3 -m pytest tests/ -q 2>&1 | tail -20
+python3 -m pytest tests/ -q --ignore=tests/test_basic.py 2>&1 | tail -20

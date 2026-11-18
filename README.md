@@ -123,28 +123,31 @@ no observable test outcome and were discarded.
 
 <!--RESULTS-->
 
-| Task | Fix size | F2P | P2P | Haiku 4.5 |
-|---|---|---:|---:|---|
-| [click-2940](https://github.com/pallets/click/pull/2940) | +8/-9 | 3 | 12 | ✅ 1/1 |
-| [click-3004](https://github.com/pallets/click/pull/3004) | +2/-0 | 5 | 295 | ◐ 1/2 ⚠️ |
-| [click-3013](https://github.com/pallets/click/pull/3013) | +2/-0 | 1 | 51 | ◐ 1/2 |
-| [click-3021](https://github.com/pallets/click/pull/3021) | +12/-6 | 1 | 142 | ❌ 0/1 |
-| [click-3152](https://github.com/pallets/click/pull/3152) | +6/-3 | 2 | 535 | ✅ 1/1 |
-| [click-3208](https://github.com/pallets/click/pull/3208) | +5/-1 | 3 | 20 | ❌ 0/1 |
-| [click-3225](https://github.com/pallets/click/pull/3225) | +20/-6 | 7 | 577 | ❌ 0/1 ⚠️ |
-| [click-3299](https://github.com/pallets/click/pull/3299) | +1/-1 | 1 | 551 | ✅ 2/2 |
-| [click-3434](https://github.com/pallets/click/pull/3434) | +8/-0 | 7 | 28 | ✅ 1/1 |
-| [click-3484](https://github.com/pallets/click/pull/3484) | +12/-5 | 3 | 680 | ✅ 1/1 |
-| [click-3509](https://github.com/pallets/click/pull/3509) | +3/-2 | 6 | 724 | ✅ 1/1 |
-| [click-3678](https://github.com/pallets/click/pull/3678) | +44/-2 | 10 | 766 | ❌ 0/1 |
-| [click-3805](https://github.com/pallets/click/pull/3805) | +9/-0 | 3 | 7 | ✅ 1/1 |
-| [click-3818](https://github.com/pallets/click/pull/3818) | +52/-24 | 5 | 3 | ❌ 0/1 |
-| [click-3865](https://github.com/pallets/click/pull/3865) | +20/-32 | 6 | 30 | ❌ 0/1 |
-| [click-3884](https://github.com/pallets/click/pull/3884) | +13/-10 | 9 | 667 | ❌ 0/1 |
+| Task | Fix size | F2P | P2P | Haiku 4.5 | Sonnet 5 |
+|---|---|---:|---:|---|---|
+| [click-2940](https://github.com/pallets/click/pull/2940) | +8/-9 | 3 | 12 | ✅ 3/3 | ✅ 3/3 |
+| [click-3004](https://github.com/pallets/click/pull/3004) | +2/-0 | 5 | 295 | ✅ 3/3 | ◐ 2/3 ⚠️ |
+| [click-3013](https://github.com/pallets/click/pull/3013) | +2/-0 | 1 | 51 | ✅ 3/3 | ✅ 3/3 |
+| [click-3021](https://github.com/pallets/click/pull/3021) | +12/-6 | 1 | 142 | ❌ 0/3 | ❌ 0/3 |
+| [click-3152](https://github.com/pallets/click/pull/3152) | +6/-3 | 2 | 535 | ✅ 3/3 | ✅ 3/3 |
+| [click-3208](https://github.com/pallets/click/pull/3208) | +5/-1 | 3 | 20 | ◐ 2/3 | ✅ 3/3 |
+| [click-3225](https://github.com/pallets/click/pull/3225) | +20/-6 | 7 | 577 | ❌ 0/3 ⚠️ | ❌ 0/3 |
+| [click-3299](https://github.com/pallets/click/pull/3299) | +1/-1 | 1 | 551 | ✅ 3/3 | ✅ 3/3 |
+| [click-3434](https://github.com/pallets/click/pull/3434) | +8/-0 | 7 | 28 | ✅ 3/3 | ✅ 3/3 |
+| [click-3484](https://github.com/pallets/click/pull/3484) | +12/-5 | 3 | 680 | ✅ 3/3 | ✅ 3/3 |
+| [click-3509](https://github.com/pallets/click/pull/3509) | +3/-2 | 6 | 724 | ✅ 3/3 | ✅ 3/3 |
+| [click-3678](https://github.com/pallets/click/pull/3678) | +44/-2 | 10 | 766 | ❌ 0/3 | ❌ 0/3 |
+| [click-3805](https://github.com/pallets/click/pull/3805) | +9/-0 | 3 | 7 | ✅ 3/3 | ✅ 3/3 |
+| [click-3818](https://github.com/pallets/click/pull/3818) | +52/-24 | 5 | 3 | ❌ 0/3 | ❌ 0/3 |
+| [click-3865](https://github.com/pallets/click/pull/3865) | +20/-32 | 6 | 30 | ❌ 0/3 ⚠️ | ❌ 0/3 ⚠️ |
+| [click-3884](https://github.com/pallets/click/pull/3884) | +13/-10 | 9 | 667 | ❌ 0/3 | ✅ 3/3 |
 
 ✅ solved in every trial · ◐ solved in some trials · ❌ never solved · ⚠️ broke existing tests in at least one trial
 
-**Haiku 4.5** — 53% of 19 attempts resolved · 7 tasks always, 2 sometimes, 7 never · 2 attempts broke existing tests · median 158s
+**Haiku 4.5** — 60% of 48 attempts resolved · 9 tasks always, 1 sometimes, 6 never · 4 attempts broke existing tests · median 149s
+**Sonnet 5** — 67% of 48 attempts resolved · 10 tasks always, 1 sometimes, 5 never · 4 attempts broke existing tests · median 88s
+
+*Of 96 graded runs, 2 edited `tests/` (reverted before grading) and 1 ran a command the screen flagged as reaching for the network (egress was blocked; the attempt failed).*
 
 ---
 
@@ -178,6 +181,17 @@ Stated plainly, because a benchmark that hides these is not worth reading:
 - **Environment, not container.** The reported numbers were produced in a
   pinned virtualenv on the host, not inside the supplied image, so they are
   reproducible on a comparable machine rather than bit-for-bit anywhere.
+- **The agent's environment is not a developer's.** `PYTHONPATH` points at the
+  worktree's `src/` instead of the editable install upstream's contributors
+  use. The suite behaves identically, and it is why nothing needs `pip` — but
+  it is a deliberate change to the project's normal setup, disclosed here
+  rather than left for a reader to find in the code.
+- **Void runs are excluded, not counted.** A run the API kills — a 429 session
+  limit, a transport error — returns a success-shaped result with zero turns
+  of work. Counting that as a failed attempt would understate whichever model
+  hit the limit, so such records are marked `void`, dropped from every count,
+  and re-run. Eight Sonnet attempts were voided this way and re-run on
+  2026-11-18; the table above contains no void records.
 - **Timing sensitivity.** A few tasks exercise terminal, pager and interrupt
   behaviour. Those were graded on an unloaded machine; a heavily loaded host
   can turn them flaky in either direction.

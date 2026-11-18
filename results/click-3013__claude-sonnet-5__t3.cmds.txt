@@ -1,0 +1,5 @@
+python3 -c " ⏎ import os ⏎ os.environ['COMP_WORDS'] = 'importer --dataset \"Sa' ⏎ os.environ['COMP_CWORD'] = '\"Sa' ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ from click.shell_completion import FishComplete ⏎  ⏎ class Dummy: ⏎     pass ⏎  ⏎ fc = FishComplete.__new__(FishComplete) ⏎ args, incomplete 
+python3 -c " ⏎ import os, sys ⏎ sys.path.insert(0, 'src') ⏎ from click.shell_completion import FishComplete ⏎  ⏎ cases = [ ⏎     ('importer --dataset \'Sa', \"'Sa\"), ⏎     ('importer --dataset Sales\\\\ Q', 'Sales\\\\ Q'), ⏎ ] ⏎ for comp_words, comp_cword in cases: ⏎     os.environ['COMP_WORDS'] = 
+python3 -m pytest tests/test_shell_completion.py -q 2>&1 | tail -40
+python3 -m pytest -q 2>&1 | tail -20
+python3 -m pytest -q --ignore=tests/test_basic.py 2>&1 | tail -20

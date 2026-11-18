@@ -1,19 +1,8 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 445460b..2400e4b 100644
+index 445460b..2193953 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -2871,7 +2871,9 @@ class Option(Parameter):
-             if show_default_is_str:
-                 default_string = f"({self.show_default})"
-             elif isinstance(default_value, (list, tuple)):
--                default_string = ", ".join(str(d) for d in default_value)
-+                default_string = ", ".join(
-+                    d.name if isinstance(d, enum.Enum) else str(d) for d in default_value
-+                )
-             elif inspect.isfunction(default_value):
-                 default_string = _("(dynamic)")
-             elif self.is_bool_flag and self.secondary_opts:
-@@ -2884,6 +2886,8 @@ class Option(Parameter):
+@@ -2884,6 +2884,8 @@ class Option(Parameter):
                  default_string = ""
              elif default_value == "":
                  default_string = '""'
@@ -22,3 +11,20 @@ index 445460b..2400e4b 100644
              else:
                  default_string = str(default_value)
  
+diff --git a/src/click/types.py b/src/click/types.py
+index e71c1c2..8aacdd8 100644
+--- a/src/click/types.py
++++ b/src/click/types.py
+@@ -387,7 +387,11 @@ class Choice(ParamType, t.Generic[ParamTypeValue]):
+         """
+         from click.shell_completion import CompletionItem
+ 
+-        str_choices = map(str, self.choices)
++        normalized_mapping = self._normalized_mapping(ctx=ctx)
++        str_choices = [
++            self.normalize_choice(choice=choice, ctx=ctx) if isinstance(choice, enum.Enum) else str(choice)
++            for choice in self.choices
++        ]
+ 
+         if self.case_sensitive:
+             matched = (c for c in str_choices if c.startswith(incomplete))

@@ -1,0 +1,22 @@
+{
+  "pr": 3865,
+  "model": "claude-haiku-4-5-20251001",
+  "trial": 2,
+  "title": "Fix short help abbreviation",
+  "elapsed_s": 175.8,
+  "agent_exit": 0,
+  "diff_lines": 30,
+  "shell_calls": 16,
+  "turns": 25,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": false,
+  "f2p_passed": 4,
+  "f2p_total": 6,
+  "p2p_broken": 0,
+  "p2p_total": 30,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [],
+  "void": null
+}

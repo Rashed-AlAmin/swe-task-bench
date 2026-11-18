@@ -1,20 +1,69 @@
 diff --git a/src/click/shell_completion.py b/src/click/shell_completion.py
-index 5bebb5a..1842b6d 100644
+index 5bebb5a..098ced2 100644
 --- a/src/click/shell_completion.py
 +++ b/src/click/shell_completion.py
-@@ -407,6 +407,15 @@ class FishComplete(ShellComplete):
-         incomplete = os.environ["COMP_CWORD"]
+@@ -404,9 +404,14 @@ class FishComplete(ShellComplete):
+ 
+     def get_completion_args(self) -> tuple[list[str], str]:
+         cwords = split_arg_string(os.environ["COMP_WORDS"])
+-        incomplete = os.environ["COMP_CWORD"]
++        incomplete_raw = os.environ["COMP_CWORD"]
          args = cwords[1:]
  
 +        # Process the incomplete value through split_arg_string to handle
-+        # quote and escape removal, the same way Bash and Zsh do via their
-+        # already-split COMP_WORDS. This ensures quotes like "Sales Q1
-+        # are properly unquoted to Sales Q1 for completion matching.
-+        if incomplete:
-+            split_incomplete = split_arg_string(incomplete)
-+            if split_incomplete:
-+                incomplete = split_incomplete[0]
++        # quotes properly (e.g., "Sa becomes Sa).
++        incomplete_parts = split_arg_string(incomplete_raw)
++        incomplete = incomplete_parts[0] if incomplete_parts else ""
 +
          # Fish stores the partial word in both COMP_WORDS and
          # COMP_CWORD, remove it from complete args.
          if incomplete and args and args[-1] == incomplete:
+diff --git a/tests/test_shell_completion.py b/tests/test_shell_completion.py
+index 06c6645..aabb397 100644
+--- a/tests/test_shell_completion.py
++++ b/tests/test_shell_completion.py
+@@ -442,6 +442,44 @@ def test_zsh_full_complete_with_colons(
+     assert result.output == expect
+ 
+ 
++@pytest.mark.parametrize(
++    ("env", "expect"),
++    [
++        # Unquoted prefix
++        (
++            {"COMP_WORDS": "cli ", "COMP_CWORD": ""},
++            "plain,a\nplain,b\tbee\n",
++        ),
++        # Double-quoted prefix with text
++        (
++            {"COMP_WORDS": 'cli "a', "COMP_CWORD": '"a'},
++            "plain,a\n",
++        ),
++        # Single-quoted prefix with text
++        (
++            {"COMP_WORDS": "cli 'a", "COMP_CWORD": "'a"},
++            "plain,a\n",
++        ),
++        # Quoted prefix with space (completion for values with spaces)
++        (
++            {"COMP_WORDS": 'cli "b', "COMP_CWORD": '"b'},
++            "plain,b\tbee\n",
++        ),
++    ],
++)
++@pytest.mark.usefixtures("_patch_for_completion")
++def test_fish_complete_with_quoted_values(runner, env: Mapping[str, str], expect: str) -> None:
++    cli = Group("cli", commands=[Command("a"), Command("b", help="bee")])
++    result = runner.invoke(
++        cli,
++        env={
++            **env,
++            "_CLI_COMPLETE": "fish_complete",
++        },
++    )
++    assert result.output == expect
++
++
+ @pytest.mark.usefixtures("_patch_for_completion")
+ def test_context_settings(runner):
+     def complete(ctx, param, incomplete):

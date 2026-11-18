@@ -1,0 +1,3 @@
+python3 -c " ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ @click.option('--units', envvar=['WEATHER_UNITS', 'UNITS'], show_envvar=True, required=True) ⏎ def report(units): ⏎     click.echo(f'reporting in {units}') ⏎  ⏎ runner = CliRunner() ⏎ result = runner.invoke(rep
+python3 -m pytest tests/ -k "envvar or env_var" -q 2>&1 | tail -40
+python3 -m pytest tests/ -q 2>&1 | tail -20

@@ -1,5 +1,5 @@
 diff --git a/src/click/testing.py b/src/click/testing.py
-index 3d3cb17..80c9eec 100644
+index 3d3cb17..7c2982d 100644
 --- a/src/click/testing.py
 +++ b/src/click/testing.py
 @@ -128,11 +128,7 @@ class _NamedTextIOWrapper(io.TextIOWrapper):
@@ -22,8 +22,8 @@ index 3d3cb17..80c9eec 100644
 -            val = next(text_input).rstrip("\r\n")
 +            try:
 +                val = next(text_input).rstrip("\r\n")
-+            except StopIteration as e:
-+                raise EOFError() from e
++            except StopIteration:
++                raise EOFError()
              sys.stdout.write(f"{val}\n")
              sys.stdout.flush()
              return val
@@ -34,22 +34,8 @@ index 3d3cb17..80c9eec 100644
 -            return next(text_input).rstrip("\r\n")
 +            try:
 +                return next(text_input).rstrip("\r\n")
-+            except StopIteration as e:
-+                raise EOFError() from e
++            except StopIteration:
++                raise EOFError()
  
          @_pause_echo(echo_input)  # type: ignore
          def _getchar(echo: bool) -> str:
-diff --git a/tests/test_chain.py b/tests/test_chain.py
-index ba11b7e..10a88f7 100644
---- a/tests/test_chain.py
-+++ b/tests/test_chain.py
-@@ -163,8 +163,7 @@ def test_pipeline(runner, args, input, expect):
-         return processor
- 
-     result = runner.invoke(cli, args, input=input)
--    # last two lines are '' and 'Aborted!'
--    assert result.output.splitlines()[:-2] == expect
-+    assert result.output.splitlines() == expect
- 
- 
- def test_args_and_chain(runner):

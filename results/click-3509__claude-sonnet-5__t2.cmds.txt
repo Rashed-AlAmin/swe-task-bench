@@ -1,0 +1,4 @@
+python3 -c " ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     '''Internal admin tools.''' ⏎  ⏎ @admin.command(deprecated=True) ⏎ def purge_cache(): ⏎     pass ⏎  ⏎ @admin.command() ⏎ @click.option('--legacy-mode', help='', deprecated=True) ⏎ def other(leg
+python3 -m pytest tests/ -k deprecated -q 2>&1 | tail -40
+find tests -iname "*deprecat*"
+python3 -m pytest tests/test_commands.py tests/test_options.py tests/test_arguments.py -k deprecated -q -p no:cacheprovider -W ignore::DeprecationWarning 2>&1 | tail -40

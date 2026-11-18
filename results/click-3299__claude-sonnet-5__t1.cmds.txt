@@ -1,0 +1,4 @@
+cat > /tmp/release.py << 'EOF' ⏎ import click ⏎  ⏎ class Semver: ⏎     def __init__(self, major, minor, patch): ⏎         self.parts = (major, minor, patch) ⏎  ⏎     def __eq__(self, other): ⏎         if type(other) is not Semver: ⏎             raise TypeError("Semver can only be compared to Semver"
+python3 -m pytest tests/ -q 2>&1 | tail -30
+git stash && python3 -m pytest tests/test_basic.py -q 2>&1 | tail -15; git stash pop
+python3 -m pytest tests/ -q --ignore=tests/test_basic.py 2>&1 | tail -20

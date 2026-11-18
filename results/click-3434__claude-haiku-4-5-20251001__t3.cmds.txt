@@ -1,0 +1,27 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3434__claude-haiku-4-5-20251001__t3 -type f -name "*.py" | head -20
+cat > /tmp/test_bug.py << 'EOF' ⏎ import click ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     """Cluster admin tools.""" ⏎  ⏎ @admin.command(options_metavar="") ⏎ def status(): ⏎     """Show cluster status.""" ⏎     click.echo("ok") ⏎  ⏎ if __name__ == "__main__": ⏎     admin() ⏎ EOF ⏎ python /tmp/test_bu
+python3 /tmp/test_bug.py status --help
+cat > /tmp/test_normal.py << 'EOF' ⏎ import click ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     """Cluster admin tools.""" ⏎  ⏎ @admin.command() ⏎ def status(): ⏎     """Show cluster status.""" ⏎     click.echo("ok") ⏎  ⏎ if __name__ == "__main__": ⏎     admin() ⏎ EOF ⏎ python3 /tmp/test_normal.py status
+grep -n "def format_help\|def get_help" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3434__claude-haiku-4-5-20251001__t3/src/click/core.py
+grep -n "def format_usage" /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3434__claude-haiku-4-5-20251001__t3/src/click/core.py
+python3 << 'EOF' ⏎ from src.click.formatting import wrap_text ⏎  ⏎ # Test what wrap_text returns with empty string ⏎ result = wrap_text("", width=78, initial_indent="Usage: test.py status ", subsequent_indent="                       ") ⏎ print(f"wrap_text('') returns: {repr(result)}") ⏎ print(f"Leng
+python3 /tmp/test_bug.py status --help
+python3 /tmp/test_normal.py status --help
+cat > /tmp/test_none.py << 'EOF' ⏎ import click ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     """Cluster admin tools.""" ⏎  ⏎ @admin.command(options_metavar=None) ⏎ def status(): ⏎     """Show cluster status.""" ⏎     click.echo("ok") ⏎  ⏎ if __name__ == "__main__": ⏎     admin() ⏎ EOF ⏎ python3 /tmp/tes
+cat > /tmp/test_args.py << 'EOF' ⏎ import click ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     """Cluster admin tools.""" ⏎  ⏎ @admin.command() ⏎ @click.option('--verbose', '-v', is_flag=True, help='Verbose output') ⏎ @click.option('--format', '-f', default='json', help='Output format') ⏎ def status(verbo
+python3 -m pytest tests/ -xvs 2>&1 | head -100
+python3 -m pytest tests/ --ignore=tests/test_basic.py -x 2>&1 | tail -50
+python3 -m pytest tests/test_formatting.py -xvs
+grep -A 20 "test_formatting_with_options_metavar_empty" tests/test_formatting.py
+grep -B 5 -A 10 "options_metavar" tests/test_formatting.py
+grep -r "options_metavar" tests/ --include="*.py"
+python3 << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ # Test 1: Empty options_metavar with no arguments (the bug case) ⏎ @click.command(options_metavar="") ⏎ def cmd1(): ⏎     """Command 1 help.""" ⏎     pass ⏎  ⏎ # Test 2: Empty options_metavar with an argument ⏎ @click.command
+python3 /tmp/test_bug.py status --help
+python3 /tmp/test_bug.py --help
+python3 -m pytest tests/ --ignore=tests/test_basic.py -x -q
+python3 << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command("very_long_command_name_that_should_trigger_wrapping", options_metavar="") ⏎ def cmd(): ⏎     """Command help.""" ⏎     pass ⏎  ⏎ runner = CliRunner() ⏎ result = runner.invoke(cmd, ["--help"]) ⏎ print(result.ou
+python3 << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎ from click.formatting import FORCED_WIDTH ⏎  ⏎ # Force a narrow width to test wrapping ⏎ FORCED_WIDTH = 50 ⏎  ⏎ @click.command() ⏎ @click.argument("very_long_argument_name_one") ⏎ @click.argument("very_long_argument_name_two") ⏎
+python3 << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎ from click.formatting import FORCED_WIDTH ⏎  ⏎ # Create a scenario where the usage would wrap ⏎ import click.formatting as fmt ⏎ original_width = fmt.FORCED_WIDTH ⏎ fmt.FORCED_WIDTH = 40  # Very narrow width ⏎  ⏎ @click.command(
+python3 -m pytest tests/test_formatting.py tests/test_commands.py -xvs 2>&1 | head -100
+git diff src/click/formatting.py
+python3 << 'EOF' ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ # Test the exact case from the bug report ⏎ @click.group() ⏎ def admin(): ⏎     """Cluster admin tools.""" ⏎  ⏎ @admin.command(options_metavar="") ⏎ def status(): ⏎     """Show cluster status.""" ⏎     click.echo("ok") ⏎  ⏎ r

@@ -1,16 +1,17 @@
 diff --git a/src/click/core.py b/src/click/core.py
-index 23d1dd5..a081ffd 100644
+index 23d1dd5..d1aff31 100644
 --- a/src/click/core.py
 +++ b/src/click/core.py
-@@ -2825,8 +2825,15 @@ class Option(Parameter):
+@@ -2825,8 +2825,16 @@ class Option(Parameter):
          # and a flag_value set to something else. Refs:
          # https://github.com/pallets/click/issues/3024#issuecomment-3146199461
          # https://github.com/pallets/click/pull/3030/commits/06847da
 +        #
-+        # This aligned value is the literal value the flag resolves to, not a
-+        # callable factory, even if it happens to be callable (e.g. a class
-+        # used as a sentinel). Track that so get_default() knows not to call
-+        # it, unlike a user-provided default which is allowed to be callable.
++        # This alignment produces the concrete value the flag represents, not a
++        # factory to call lazily, so it must not be invoked even if it happens to be
++        # callable (e.g. a class used as `flag_value`). Track that here so
++        # `get_default` can tell this case apart from a user-provided callable
++        # default, which is still called as usual.
 +        self._default_is_flag_value = False
          if self.default is True and self.flag_value is not UNSET:
              self.default = self.flag_value
@@ -18,27 +19,20 @@ index 23d1dd5..a081ffd 100644
  
          # Set the default flag_value if it is not set.
          if self.flag_value is UNSET:
-@@ -2896,6 +2903,27 @@ class Option(Parameter):
+@@ -2896,6 +2904,20 @@ class Option(Parameter):
              result += f" (env var: '{self.envvar}')"
          return result
  
 +    def get_default(
 +        self, ctx: Context, call: bool = True
 +    ) -> t.Any | t.Callable[[], t.Any] | None:
-+        # For a non-boolean flag, ``default`` may have been aligned to
-+        # ``flag_value`` in __init__ (when the user passed ``default=True``).
-+        # That value is the literal value the flag resolves to, not a
-+        # callable factory, even if it happens to be callable (e.g. a class
-+        # used as a sentinel). It must never be called, regardless of the
-+        # ``call`` argument. This is distinct from a user explicitly setting
-+        # ``default`` to a callable themselves, which is still invoked as a
-+        # dynamic default factory.
 +        value = super().get_default(ctx, call=False)
 +
-+        if self._default_is_flag_value and value is self.default:
-+            return value
-+
-+        if call and callable(value):
++        if (
++            call
++            and callable(value)
++            and not (self._default_is_flag_value and value is self.flag_value)
++        ):
 +            value = value()
 +
 +        return value

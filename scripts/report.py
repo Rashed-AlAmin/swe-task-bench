@@ -5,9 +5,33 @@ Each (task, model) pair is run k times; a cell shows how many trials resolved.
 import glob, json, os, collections, statistics
 ROOT = os.path.expanduser("~/Desktop/swe-task-bench")
 SHORT = {"claude-haiku-4-5-20251001":"Haiku 4.5","claude-sonnet-5":"Sonnet 5","claude-opus-5":"Opus 5"}
+def void_reason(rec, path):
+    """Why this run should not be counted, or None.
+
+    A run the API killed (a 429 session limit, a transport error) measures the
+    quota, not the model: the agent never got an attempt. run_task.py records
+    that as `void`, but records written before it did so carry no such field,
+    and they would silently be counted as attempts the model failed. For those,
+    read the verdict back out of the saved transcript rather than trusting the
+    absence of a flag.
+    """
+    if "void" in rec: return rec["void"]
+    try: lines = open(path[:-5] + ".jsonl").read().splitlines()
+    except OSError: return None
+    for line in lines:
+        try: d = json.loads(line)
+        except Exception: continue
+        if (d.get("type") == "result" and d.get("is_error")
+                and (d.get("api_error_status") or d.get("terminal_reason") == "api_error")):
+            return f'api_error {d.get("api_error_status")}'
+    return None
+
 runs = collections.defaultdict(list)
+voids = []
 for f in glob.glob(f"{ROOT}/results/click-*.json"):
-    r = json.load(open(f)); runs[(r["pr"], r["model"])].append(r)
+    r = json.load(open(f))
+    if void_reason(r, f): voids.append(r); continue
+    runs[(r["pr"], r["model"])].append(r)
 models = [m for m in SHORT if any(k[1]==m for k in runs)]
 prs = sorted({k[0] for k in runs})
 tasks = {int(os.path.basename(d).split("-")[1]): json.load(open(f"{d}/task.json"))
@@ -43,6 +67,22 @@ for m in models:
     lines.append(f"**{SHORT[m]}** — {rate:.0f}% of {len(rs)} attempts resolved · "
                  f"{always} tasks always, {flaky} sometimes, {never} never · "
                  f"{reg} attempts broke existing tests · median {statistics.median([r['elapsed_s'] for r in rs]):.0f}s")
+# Two behaviours worth reporting even though neither changes a score: grading
+# reverts tests/ and re-applies the official test.patch, and egress is
+# blackholed. Counted here rather than written into the README by hand, so the
+# number cannot outlive the runs it describes.
+allruns = [r for v in runs.values() for r in v]
+tamper = sum(1 for r in allruns if r.get("tampered_with_tests"))
+netflag = sum(1 for r in allruns if r.get("contamination_flags"))
+if tamper or netflag:
+    lines.append("")
+    lines.append(f"*Of {len(allruns)} graded runs, {tamper} edited `tests/` "
+                 f"(reverted before grading) and {netflag} ran a command the "
+                 f"screen flagged as reaching for the network (egress was blocked; "
+                 f"the attempt failed).*")
+if voids:
+    lines.append("")
+    lines.append(f"*{len(voids)} run(s) excluded as void (API error, not a model failure) and re-run.*")
 out = "\n".join(lines)
 print(out)
 rp = f"{ROOT}/README.md"; s = open(rp).read()

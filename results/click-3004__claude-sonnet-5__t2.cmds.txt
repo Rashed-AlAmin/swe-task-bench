@@ -1,0 +1,5 @@
+grep -n "__version__" src/click/__init__.py && head -40 CHANGES.rst
+cat > /tmp/ingest.py << 'EOF' ⏎ import enum ⏎ import click ⏎  ⏎ class HashType(enum.Enum): ⏎     MD5 = enum.auto() ⏎     SHA1 = enum.auto() ⏎  ⏎ class Priority(enum.IntEnum): ⏎     LOW = 1 ⏎     HIGH = 2 ⏎  ⏎ @click.command() ⏎ @click.option( ⏎     "--checksum", ⏎     type=click.Choice(HashType), ⏎ 
+python3 -m pytest tests/ -q 2>&1 | tail -40
+python3 -m pytest tests/ -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -60
+PYTHONPATH=src python3 -c " ⏎ import click ⏎  ⏎ @click.command() ⏎ @click.option('--color', type=click.Choice(['red','green','blue']), default='green', show_default=True) ⏎ def cli(color): ⏎     pass ⏎  ⏎ from click.testing import CliRunner ⏎ r = CliRunner().invoke(cli, ['--help']) ⏎ print(r.output)

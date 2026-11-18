@@ -1,0 +1,18 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t3 -type f -name "*.py" | head -20
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t3/tests -name "*.py" -type f | head -10
+python -m pytest tests/test_commands.py::test_abort_exceptions_with_disabled_standalone_mode -xvs 2>&1 | head -50
+python3 -m pytest tests/test_commands.py::test_abort_exceptions_with_disabled_standalone_mode -xvs 2>&1 | head -100
+python3 -m pytest tests/test_commands.py -xvs 2>&1 | tail -20
+python3 -m pytest tests/test_termui.py -xvs 2>&1 | tail -20
+python3 -m pytest test_keyboard_interrupt_race.py -xvs
+python3 -c " ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ @click.option('--target', prompt='Target host') ⏎ def deploy(target): ⏎     click.echo(f'Deploying to {target}') ⏎  ⏎ runner = CliRunner() ⏎ result = runner.invoke(deploy, input='\x03') ⏎ print('Exit code:', re
+python3 -m pytest test_keyboard_interrupt_race.py -xvs
+python3 -m pytest tests/test_commands.py::test_abort_exceptions_with_disabled_standalone_mode -xvs
+python3 -c " ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ def deploy(): ⏎     raise KeyboardInterrupt() ⏎  ⏎ runner = CliRunner() ⏎ result = runner.invoke(deploy) ⏎ print('Exit code:', result.exit_code) ⏎ print('Output:') ⏎ print(result.output) ⏎ print('Stderr:') ⏎ pr
+python3 -c " ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ @click.command() ⏎ def deploy(): ⏎     raise KeyboardInterrupt() ⏎  ⏎ runner = CliRunner() ⏎ result = runner.invoke(deploy) ⏎ print('Exit code:', result.exit_code) ⏎ print('Output:') ⏎ print(repr(result.output)) ⏎ "
+python3 -m pytest tests/test_commands.py::test_abort_exceptions_with_disabled_standalone_mode -xvs
+python3 -m pytest test_keyboard_interrupt_race.py -xvs
+python3 -m pytest tests/test_commands.py tests/test_termui.py -x 2>&1 | tail -30
+python3 -c " ⏎ import click ⏎ from click.testing import CliRunner ⏎ import time ⏎  ⏎ @click.command() ⏎ @click.option('--target', prompt='Target host') ⏎ def deploy(target): ⏎     for step in range(3): ⏎         click.echo(f'step {step} on {target}') ⏎         time.sleep(0.1) ⏎  ⏎ runner = CliRunner
+rm /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t3/test_race.py /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3818__claude-haiku-4-5-20251001__t3/test_keyboard_interrupt_race.py
+python3 -m pytest tests/ -x --tb=short 2>&1 | tail -50

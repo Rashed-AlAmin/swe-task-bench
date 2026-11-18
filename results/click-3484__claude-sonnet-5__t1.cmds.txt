@@ -1,0 +1,6 @@
+cat > /tmp/deploy.py << 'EOF' ⏎ import click ⏎  ⏎ class ConfigPath(click.ParamType): ⏎     name = "configpath" ⏎  ⏎     def convert(self, value, param, ctx): ⏎         click.echo(f"{param.name} origin={ctx.get_parameter_source(param.name)}") ⏎         return value ⏎  ⏎ @click.command() ⏎ @click.opti
+cat > /tmp/debug_flag.py << 'EOF' ⏎ import click ⏎ from click.core import ParameterSource ⏎  ⏎ def write_env(ctx, param, value): ⏎     src = ctx.get_parameter_source(param.name) ⏎     click.echo(f"callback sees origin={src}") ⏎     if src != ParameterSource.DEFAULT: ⏎         click.echo("user explic
+python3 -m pytest tests/ -q 2>&1 | tail -40
+python3 -m pytest tests/ -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -60
+grep -rl "parameter_source\|ParameterSource" tests/ | head -20
+python3 -m pytest tests/test_context.py tests/test_defaults.py -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -20

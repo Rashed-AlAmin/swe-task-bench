@@ -1,0 +1,22 @@
+{
+  "pr": 3678,
+  "model": "claude-sonnet-5",
+  "trial": 2,
+  "title": "Fix parsing when a parameter is named `help`",
+  "elapsed_s": 96.7,
+  "agent_exit": 0,
+  "diff_lines": 26,
+  "shell_calls": 4,
+  "turns": 12,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": false,
+  "f2p_passed": 0,
+  "f2p_total": 10,
+  "p2p_broken": 0,
+  "p2p_total": 766,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [],
+  "void": null
+}

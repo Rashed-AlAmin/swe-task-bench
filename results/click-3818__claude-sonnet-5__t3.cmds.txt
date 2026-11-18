@@ -1,0 +1,4 @@
+python -c " ⏎ import click ⏎ from click.testing import CliRunner ⏎ import click.core as core ⏎  ⏎ orig_echo = core.echo ⏎ calls = {'n': 0} ⏎  ⏎ def flaky_echo(*args, **kwargs): ⏎     calls['n'] += 1 ⏎     if calls['n'] == 1: ⏎         orig_echo(*args, **kwargs) ⏎         raise KeyboardInterrupt() ⏎ 
+python3 -c " ⏎ import click ⏎ from click.testing import CliRunner ⏎ import click.core as core ⏎  ⏎ orig_echo = core.echo ⏎ calls = {'n': 0} ⏎  ⏎ def flaky_echo(*args, **kwargs): ⏎     calls['n'] += 1 ⏎     if calls['n'] == 1: ⏎         orig_echo(*args, **kwargs) ⏎         raise KeyboardInterrupt() ⏎
+python3 -m pytest tests/test_commands.py tests/test_basic.py tests/test_context.py -q 2>&1 | tail -40
+python3 -m pytest tests/ -q 2>&1 | tail -20

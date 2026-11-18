@@ -1,0 +1,21 @@
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3509__claude-haiku-4-5-20251001__t1 -type f -name "*.py" | head -20
+cat > test_deprecated_bug.py << 'EOF' ⏎ import click ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     """Internal admin tools.""" ⏎  ⏎ @admin.command(deprecated=True) ⏎ def purge_cache(): ⏎     pass ⏎  ⏎ @admin.command(deprecated=True) ⏎ def another_deprecated(): ⏎     """Has a docstring. (DEPRECATED)""" ⏎ 
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     \"\"\"Internal admin tools.\"\"\" ⏎  ⏎ @admin.command(deprecated=True) ⏎ def purge_cache(): ⏎     pass ⏎  ⏎ @admin.command(deprecated=True) ⏎ def another_deprecated(): ⏎     \"\"\"Has a docs
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ @click.command() ⏎ @click.option('--legacy-mode', help='', deprecated=True) ⏎ def test_option(): ⏎     pass ⏎  ⏎ test_option(['--help']) ⏎ " ⏎ 
+find /home/rashed-al-amin/Desktop/swe-task-bench/work/click-3509__claude-haiku-4-5-20251001__t1/tests -name "*.py" | xargs grep -l "deprecated" | head -5
+grep -A 10 "deprecated" tests/test_commands.py | head -40
+grep -B 5 -A 10 'help=""' tests/test_options.py | head -50
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     \"\"\"Internal admin tools.\"\"\" ⏎  ⏎ @admin.command(deprecated=True) ⏎ def purge_cache(): ⏎     pass ⏎  ⏎ @admin.command(deprecated=True) ⏎ def another_deprecated(): ⏎     \"\"\"Has a docs
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ @click.command() ⏎ @click.option('--legacy-mode', help='', deprecated=True) ⏎ def test_option(): ⏎     pass ⏎  ⏎ test_option(['--help']) ⏎ " ⏎ 
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     \"\"\"Internal admin tools.\"\"\" ⏎  ⏎ @admin.command(deprecated=True) ⏎ def has_help(): ⏎     \"\"\"Clear the cache.\"\"\" ⏎     pass ⏎  ⏎ @admin.command(deprecated='Use new_command instead
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ @click.command() ⏎ @click.option('--legacy-mode', help='Use new mode instead', deprecated=True) ⏎ @click.option('--old-flag', help='', deprecated=True) ⏎ @click.option('--another-old', deprecated=True) ⏎ def test_option(): ⏎  
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     \"\"\"Internal admin tools.\"\"\" ⏎  ⏎ @admin.command(deprecated='Use new_command instead') ⏎ def old_command(): ⏎     pass ⏎  ⏎ @admin.command(deprecated='Use new_command instead') ⏎ def an
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎  ⏎ @click.group() ⏎ def admin(): ⏎     \"\"\"Internal admin tools.\"\"\" ⏎  ⏎ @admin.command(deprecated='Use new_command instead') ⏎ def old_command(): ⏎     pass ⏎  ⏎ @admin.command(deprecated='Use new_command instead') ⏎ def an
+python3 -m pytest tests/test_commands.py::test_deprecated_in_help_messages -xvs
+python3 -m pytest tests/test_commands.py -k deprecated -xvs
+python3 -m pytest tests/test_options.py -k deprecated -xvs
+python3 -m pytest tests/ --tb=short 2>&1 | tail -50
+python3 -m pytest tests/ --ignore=tests/test_basic.py -q 2>&1 | tail -30
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ runner = CliRunner() ⏎  ⏎ # Test 1: Command with no docstring but deprecated=True ⏎ @click.group() ⏎ def admin(): ⏎     \"\"\"Internal admin tools.\"\"\" ⏎  ⏎ @admin.command(deprecated=Tru
+python3 -c " ⏎ import sys ⏎ sys.path.insert(0, 'src') ⏎ import click ⏎ from click.testing import CliRunner ⏎  ⏎ runner = CliRunner() ⏎  ⏎ # Test with deprecated=string (reason provided) ⏎ @click.group() ⏎ def cli(): ⏎     \"\"\"CLI tools.\"\"\" ⏎  ⏎ @cli.command(deprecated='Use new_command instead')
+git diff src/click/core.py

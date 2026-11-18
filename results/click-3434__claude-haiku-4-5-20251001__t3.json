@@ -1,0 +1,22 @@
+{
+  "pr": 3434,
+  "model": "claude-haiku-4-5-20251001",
+  "trial": 3,
+  "title": "Fix `HelpFormatter.write_usage` producing spurious characters",
+  "elapsed_s": 136.0,
+  "agent_exit": 0,
+  "diff_lines": 59,
+  "shell_calls": 27,
+  "turns": 36,
+  "stop_reason": "success",
+  "truncated": false,
+  "contamination_flags": [],
+  "resolved": true,
+  "f2p_passed": 7,
+  "f2p_total": 7,
+  "p2p_broken": 0,
+  "p2p_total": 28,
+  "tampered_with_tests": false,
+  "p2p_broken_ids": [],
+  "void": null
+}

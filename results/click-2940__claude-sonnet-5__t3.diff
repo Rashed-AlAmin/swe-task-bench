@@ -1,18 +1,3 @@
-diff --git a/CHANGES.rst b/CHANGES.rst
-index d2d2570..049e7a0 100644
---- a/CHANGES.rst
-+++ b/CHANGES.rst
-@@ -24,6 +24,10 @@ Unreleased
- -   Lazily import ``shutil``. :pr:`3023`
- -   Properly forward exception information to resources registered with
-     ``click.core.Context.with_resource()``. :issue:`2447` :pr:`3058`
-+-   Fix ``CliRunner`` turning a normal end-of-input while iterating
-+    ``sys.stdin`` (e.g. ``for line in a_file_argument``) into an
-+    ``EOFError``, which made unrelated commands abort with ``Aborted!``
-+    during testing.
- 
- Version 8.2.2
- -------------
 diff --git a/src/click/testing.py b/src/click/testing.py
 index 3d3cb17..f6f60b8 100644
 --- a/src/click/testing.py

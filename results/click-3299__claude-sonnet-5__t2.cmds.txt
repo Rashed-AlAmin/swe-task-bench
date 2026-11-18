@@ -1,0 +1,4 @@
+cat > /tmp/release.py << 'EOF' ⏎ import click ⏎  ⏎ class Semver: ⏎     def __init__(self, major, minor, patch): ⏎         self.parts = (major, minor, patch) ⏎  ⏎     def __eq__(self, other): ⏎         if type(other) is not Semver: ⏎             raise TypeError("Semver can only be compared to Semver"
+PYTHONPATH=src python3 /tmp/release.py --help ⏎ echo "---" ⏎ PYTHONPATH=src python3 /tmp/release.py
+python3 -m pytest tests/ -q -x 2>&1 | tail -30
+python3 -m pytest tests/ -q -W "ignore::pytest.PytestRemovedIn10Warning" 2>&1 | tail -40
